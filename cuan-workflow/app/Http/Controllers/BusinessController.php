@@ -27,10 +27,13 @@ class BusinessController extends Controller
             'traffic' => 'integer',
             'conversion_rate' => 'numeric',
             'ad_spend' => 'numeric',
+            'ad_spend' => 'numeric',
             'target_revenue' => 'numeric',
             'available_cash' => 'numeric',
             'max_capacity' => 'integer',
         ]);
+
+        \Illuminate\Support\Facades\Log::info('Business Update Request:', $request->all());
 
         $profile = $request->user()->businessProfile;
         

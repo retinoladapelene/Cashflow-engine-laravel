@@ -30,33 +30,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 2. Business Profiles (One-to-One with Users)
-        Schema::create('business_profiles', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('business_name')->default('My Business');
-            $table->string('currency')->default('IDR');
-            
-            // Financial Core
-            $table->decimal('selling_price', 15, 2)->default(0);
-            $table->decimal('variable_costs', 15, 2)->default(0);
-            $table->decimal('fixed_costs', 15, 2)->default(0);
-            
-            // Marketing
-            $table->integer('traffic')->default(0);
-            $table->decimal('conversion_rate', 5, 2)->default(0);
-            $table->decimal('ad_spend', 15, 2)->default(0);
-            
-            // Goals
-            $table->decimal('target_revenue', 15, 2)->default(0);
-            
-            // Capacity & Reality
-            $table->decimal('available_cash', 15, 2)->default(0);
-            $table->integer('max_capacity')->default(1000);
-            
-            $table->timestamps();
-        });
-
         // 3. Ad Arsenal (Promotional Cards)
         Schema::create('ad_arsenals', function (Blueprint $table) {
             $table->id();
@@ -68,18 +41,6 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
-        });
-
-        // 4. Roadmap Progress
-        Schema::create('roadmap_progress', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('step_id'); // e.g., 'market-research'
-            $table->string('status')->default('completed'); // 'completed', 'unlocked'
-            $table->timestamp('completed_at')->useCurrent();
-            $table->timestamps();
-
-            $table->unique(['user_id', 'step_id']);
         });
 
         // 5. Activity Logs
@@ -100,9 +61,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('activity_logs');
-        Schema::dropIfExists('roadmap_progress');
         Schema::dropIfExists('ad_arsenals');
-        Schema::dropIfExists('business_profiles');
         Schema::dropIfExists('users');
     }
 };

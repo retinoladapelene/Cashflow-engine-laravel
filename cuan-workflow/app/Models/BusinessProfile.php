@@ -9,7 +9,20 @@ class BusinessProfile extends Model
 {
     use HasFactory;
 
-    protected $guarded = ['id'];
+    protected $fillable = [
+        'user_id',
+        'business_name',
+        'selling_price',
+        'variable_costs',
+        'fixed_costs',
+        'traffic',
+        'conversion_rate',
+        'ad_spend',
+        'target_revenue',
+        'available_cash',
+        'max_capacity',
+        'currency',
+    ];
 
     protected $casts = [
         'selling_price' => 'decimal:2',

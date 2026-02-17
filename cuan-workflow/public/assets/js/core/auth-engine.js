@@ -49,6 +49,7 @@ export const initAuthListener = async () => {
             const role = user.role || 'user';
             sessionStorage.setItem('cuan_user_role', role);
             sessionStorage.setItem('cuan_user_display_name', user.name || user.username);
+            sessionStorage.setItem('cuan_user_avatar', user.avatar || '');
 
             updateAdminUI(role);
 
@@ -248,4 +249,13 @@ const updateUIState = (isRegister) => {
             el.classList.add('hidden');
         }
     });
+};
+
+export const requestPasswordReset = async (email) => {
+    try {
+        const response = await api.post('/forgot-password', { email });
+        return { success: true, message: response.message };
+    } catch (error) {
+        throw error;
+    }
 };

@@ -91,6 +91,9 @@ export function calculateGoal() {
         targetPrice: targetPrice
     });
 
+    // Force immediate save for critical goal updates
+    businessCore.saveToApi();
+
     // 3. REACTIVE: Read back from State
     const s = businessCore.state;
     const income = s.targetRevenue || 0;

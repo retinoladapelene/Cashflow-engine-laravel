@@ -7,7 +7,75 @@
 import { api } from '../services/api.js';
 import { showToast, formatDate } from '../utils/helpers.js';
 
+// --- GLOBAL ACTIONS (Attached to window for HTML access) ---
+
+// System Feature Toggle
+window.toggleSystemFeature = (feature, isActive) => {
+    console.log(`Toggling ${feature} to ${isActive}`);
+    showToast(`Feature ${feature} ${isActive ? 'enabled' : 'disabled'} (Local Only)`, "success");
+    // In real implementation: api.post('/admin/settings', { key: feature, value: isActive })
+};
+
+// Global User Actions
+window.banUser = async (userId) => {
+    if (!confirm("Are you sure you want to ban this user?")) return;
+    try {
+        await api.post(`/admin/users/${userId}/ban`);
+        showToast("User banned successfully", "success");
+        loadUsers();
+    } catch (error) {
+        showToast("Failed to ban user", "error");
+    }
+};
+
+window.unbanUser = async (userId) => {
+    if (!confirm("Unban this user?")) return;
+    try {
+        await api.post(`/admin/users/${userId}/unban`);
+        showToast("User unbanned successfully", "success");
+        loadUsers();
+    } catch (error) {
+        showToast("Failed to unban user", "error");
+    }
+};
+
+window.promoteUser = async (userId) => {
+    if (!confirm("Promote this user to Admin?")) return;
+    try {
+        await api.post(`/admin/users/${userId}/promote`);
+        showToast("User promoted to Admin", "success");
+        loadUsers();
+    } catch (error) {
+        showToast("Failed to promote user", "error");
+    }
+};
+
+window.exportUserCSV = () => {
+    showToast("Export feature coming soon to API version.", "info");
+};
+
+window.verifyDataIntegrity = () => {
+    const stats = document.getElementById('integrity-stats');
+    if (stats) stats.classList.remove('hidden');
+    showToast("Data Integrity Check Passed", "success");
+};
+
+window.checkInactiveUsers = () => {
+    const stats = document.getElementById('inactive-user-stats');
+    if (stats) stats.classList.remove('hidden');
+    showToast("Scan Complete: 0 Inactive Users", "info");
+};
+
+window.updateBroadcastSystem = () => {
+    const message = document.getElementById('broadcast-message').value;
+    const isActive = document.getElementById('broadcast-active').value;
+
+    console.log(`Broadcast Update: ${message} (${isActive})`);
+    showToast("Broadcast settings updated (Local Only)", "success");
+};
+
 export const initAdminDashboard = async () => {
+    console.log("Admin Dashboard Initialization...");
     // Check if on admin page (using the main dashboard view ID)
     if (!document.getElementById('view-dashboard')) return;
 
@@ -210,75 +278,7 @@ const loadUsers = async () => {
     }
 };
 
-// Global Actions for HTML onclick
-window.banUser = async (userId) => {
-    if (!confirm("Are you sure you want to ban this user?")) return;
-    try {
-        await api.post(`/admin/users/${userId}/ban`);
-        showToast("User banned successfully", "success");
-        loadUsers();
-    } catch (error) {
-        showToast("Failed to ban user", "error");
-    }
-};
 
-window.unbanUser = async (userId) => {
-    if (!confirm("Unban this user?")) return;
-    try {
-        await api.post(`/admin/users/${userId}/unban`);
-        showToast("User unbanned successfully", "success");
-        loadUsers();
-    } catch (error) {
-        showToast("Failed to unban user", "error");
-    }
-};
-
-window.promoteUser = async (userId) => {
-    if (!confirm("Promote this user to Admin?")) return;
-    try {
-        await api.post(`/admin/users/${userId}/promote`);
-        showToast("User promoted to Admin", "success");
-        loadUsers();
-    } catch (error) {
-        showToast("Failed to promote user", "error");
-    }
-};
-
-// Stub for export functions if needed
-window.exportUserCSV = () => {
-    showToast("Export feature coming soon to API version.", "info");
-};
-
-// System Feature Toggle (Stubbed logic for now until SystemController exists)
-window.toggleSystemFeature = (feature, isActive) => {
-    console.log(`Toggling ${feature} to ${isActive}`);
-    showToast(`Feature ${feature} ${isActive ? 'enabled' : 'disabled'} (Local Only)`, "success");
-    // In real implementation: api.post('/admin/settings', { key: feature, value: isActive })
-};
-
-// Data Integrity Check (Stub)
-window.verifyDataIntegrity = () => {
-    const stats = document.getElementById('integrity-stats');
-    if (stats) stats.classList.remove('hidden');
-    showToast("Data Integrity Check Passed", "success");
-};
-
-// Inactive Users Check (Stub)
-window.checkInactiveUsers = () => {
-    const stats = document.getElementById('inactive-user-stats');
-    if (stats) stats.classList.remove('hidden');
-    showToast("Scan Complete: 0 Inactive Users", "info");
-};
-
-// Broadcast System Update (Stub)
-window.updateBroadcastSystem = () => {
-    const message = document.getElementById('broadcast-message').value;
-    const isActive = document.getElementById('broadcast-active').value;
-
-    console.log(`Broadcast Update: ${message} (${isActive})`);
-    showToast("Broadcast settings updated (Local Only)", "success");
-    // In real implementation: api.post('/admin/broadcast', { message, is_active: isActive })
-};
 
 // Auto-Initialize when DOM is ready
 if (document.readyState === 'loading') {

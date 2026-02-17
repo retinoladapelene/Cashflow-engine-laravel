@@ -150,24 +150,42 @@
                         <option value="AUD">AUD (A$)</option>
                         <option value="JPY">JPY (¥)</option>
                     </select>
-                    <button id="theme-toggle" type="button"
-                        class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5">
-                        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-                        </svg>
-                        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                                fill-rule="evenodd" clip-rule="evenodd"></path>
-                        </svg>
-                    </button>
-                    <button id="btn-logout"
-                        class="text-slate-500 dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5 transition-colors"
-                        title="Sign Out">
-                        <i class="fas fa-sign-out-alt text-lg"></i>
-                    </button>
+                    <!-- Settings Dropdown -->
+                    <div class="relative">
+                        <button id="settings-menu-btn"
+                            class="p-2 text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none"
+                            title="Settings">
+                            <i class="fas fa-cog text-xl"></i>
+                        </button>
+                        <!-- Dropdown Menu -->
+                        <div id="settings-dropdown"
+                            class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transform origin-top-right transition-all duration-200">
+                            <div class="py-1">
+                                <a href="{{ route('settings') }}?tab=profile"
+                                    class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400">
+                                    <i class="fas fa-user w-5"></i> Profile
+                                </a>
+                                <a href="{{ route('settings') }}?tab=preferences"
+                                    class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400">
+                                    <i class="fas fa-sliders-h w-5"></i> Preferences
+                                </a>
+                                <a href="{{ route('settings') }}?tab=security"
+                                    class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400">
+                                    <i class="fas fa-shield-alt w-5"></i> Security
+                                </a>
+                                <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                                <a href="{{ route('settings') }}?tab=system"
+                                    class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400">
+                                    <i class="fas fa-history w-5"></i> Activity Log
+                                </a>
+                                <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                                <button id="dropdown-logout-btn"
+                                    class="w-full text-left block px-4 py-2 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-700 dark:hover:text-rose-300 transition-colors">
+                                    <i class="fas fa-sign-out-alt w-5"></i> Log Out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="hidden md:flex items-center space-x-6">
                     </div>
                 </div>
@@ -188,8 +206,13 @@
                 <div
                     class="md:col-span-7 flex flex-col items-center md:items-start text-center md:text-left space-y-8 px-4 md:px-0">
 
-                    <div id="greeting-container" class="hidden">
-                        <h3 id="greeting-text" class="text-xl font-bold text-slate-900 dark:text-white"></h3>
+                    <div id="greeting-container" class="hidden flex items-center gap-4 mb-4">
+                        <img id="hero-avatar" src="" alt="Profile" 
+                             class="w-14 h-14 rounded-full object-cover border-2 border-emerald-500 shadow-md p-0.5 bg-white dark:bg-slate-800">
+                        <div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-0.5">Welcome back,</p>
+                            <h3 id="greeting-text" class="text-xl font-bold text-slate-900 dark:text-white leading-none"></h3>
+                        </div>
                     </div>
 
                     <div
@@ -714,7 +737,40 @@
             </button>
         </div>
     </div>
+    <script type="module">
+        import { logoutUser } from '/assets/js/core/auth-engine.js';
+        
+        const logoutBtn = document.getElementById('dropdown-logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                if (confirm('Are you sure you want to logout?')) {
+                    await logoutUser();
+                }
+            });
+        }
+    </script>
     <script type="module" src="{{ asset('assets/js/core/ad-arsenal-frontend.js') }}"></script>
+    <script>
+        // Settings Dropdown Logic
+        const settingsBtn = document.getElementById('settings-menu-btn');
+        const settingsDropdown = document.getElementById('settings-dropdown');
+
+        if (settingsBtn && settingsDropdown) {
+            settingsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                settingsDropdown.classList.toggle('hidden');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!settingsBtn.contains(e.target) && !settingsDropdown.contains(e.target)) {
+                    settingsDropdown.classList.add('hidden');
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

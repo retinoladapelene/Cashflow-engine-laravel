@@ -38,6 +38,15 @@ function initGreeting() {
     // Set greeting text
     greetingText.textContent = `${timeGreeting}, ${displayName}`;
 
+    // Set avatar
+    const avatarImg = select('#hero-avatar');
+    if (avatarImg) {
+        const storedAvatar = sessionStorage.getItem('cuan_user_avatar');
+        // Use stored avatar or generate UI Avatar regular fallback
+        const avatarUrl = storedAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=10b981&color=fff`;
+        avatarImg.src = avatarUrl;
+    }
+
     // Show greeting container
     greetingContainer.classList.remove('hidden');
 }

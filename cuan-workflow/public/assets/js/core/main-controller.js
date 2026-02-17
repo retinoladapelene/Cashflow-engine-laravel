@@ -20,6 +20,7 @@ const INPUT_MAP = {
 
     // Goal Planner
     'goal-income': 'targetRevenue',
+    'goal-price': 'sellingPrice', // Added mapping
 
     // Empire Growth
     'empire-business-name': 'businessName',
@@ -109,6 +110,11 @@ class MainController {
 
             // Legacy support
             if (typeof updateCalculator === 'function') updateCalculator();
+
+            // Auto-calculate Goal Planner if data exists
+            if (state.targetRevenue > 0) {
+                if (typeof calculateGoal === 'function') calculateGoal();
+            }
         });
     }
 

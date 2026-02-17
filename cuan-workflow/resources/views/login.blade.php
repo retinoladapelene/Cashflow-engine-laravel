@@ -7,6 +7,9 @@
     <title>CuanCapital - Premium Access</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#10b981">
+    <link rel="apple-touch-icon" href="/assets/icon/logo-2.svg">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <style>
@@ -241,7 +244,7 @@
     </div>
 
     <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
 
     <!-- Forgot Password Modal -->
     <div id="modal-forgot"
@@ -286,13 +289,83 @@
     </div>
 
     <script type="module">
-        import { initAuthListener, initLoginUI } from '/assets/js/core/auth-engine.js';
+        import { initAuthListener, initLoginUI, requestPasswordReset } from '/assets/js/core/auth-engine.js';
+        import { Toast } from '/assets/js/components/toast-notification.js';
 
         document.addEventListener('DOMContentLoaded', () => {
             // Init Listener
             initAuthListener();
             // Init UI Logic
             initLoginUI();
+
+            // Forgot Password Logic
+            const modal = document.getElementById('modal-forgot');
+            const linkForgot = document.getElementById('link-forgot-pass');
+            const btnCancel = document.getElementById('btn-cancel-reset');
+            const btnConfirm = document.getElementById('btn-confirm-reset');
+            const inputResetEmail = document.getElementById('input-forgot-identity');
+            const spinnerReset = document.getElementById('spinner-reset');
+
+            // Import Toast removed (moved to top)
+
+            if (linkForgot && modal) {
+                // Show Modal
+                linkForgot.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    modal.classList.remove('hidden');
+                    // Small delay to allow display block to apply before opacity transition
+                    requestAnimationFrame(() => {
+                        modal.classList.remove('opacity-0');
+                    });
+                });
+
+                // Hide Modal Function
+                const hideModal = () => {
+                    modal.classList.add('opacity-0');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                    }, 300); // Match transition duration
+                };
+
+                // Cancel Button
+                if (btnCancel) {
+                    btnCancel.addEventListener('click', hideModal);
+                }
+
+                // Confirm Button (API Call)
+                if (btnConfirm) {
+                    btnConfirm.addEventListener('click', async () => {
+                        const email = inputResetEmail.value;
+                        if (!email) {
+                            Toast.error("Please enter your email"); // Simple validation
+                            return;
+                        }
+
+                        // UI Loading State
+                        btnConfirm.disabled = true;
+                        spinnerReset.classList.remove('hidden');
+                        btnConfirm.querySelector('span').classList.add('hidden');
+
+                        try {
+                            const result = await requestPasswordReset(email);
+                            Toast.success(result.message); // Show success message from API
+                            hideModal();
+                        } catch (error) {
+                            Toast.error(error.message || "Failed to send reset link.");
+                        } finally {
+                            // Reset UI State
+                            btnConfirm.disabled = false;
+                            spinnerReset.classList.add('hidden');
+                            btnConfirm.querySelector('span').classList.remove('hidden');
+                        }
+                    });
+                }
+                
+                // Close on click outside
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) hideModal();
+                });
+            }
         });
     </script>
     <script>
@@ -317,8 +390,19 @@
             }
         }
 
+
         setupToggle('toggle-pass', 'input-password');
         setupToggle('toggle-confirm-pass', 'input-confirm-password');
+    </script>
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((reg) => console.log('Service Worker registered!', reg))
+                    .catch((err) => console.log('Service Worker registration failed:', err));
+            });
+        }
     </script>
 </body>
 

@@ -17,7 +17,7 @@
         }
     </style>
     <script type="module">
-        import { initAuthListener } from './assets/js/core/auth-engine.js';
+        import { initAuthListener } from '/assets/js/core/auth-engine.js';
         initAuthListener();
     </script>
 
@@ -699,7 +699,7 @@
     </div>
 
     <!-- Scripts -->
-    <script type="module" src="{{ asset('assets/js/core/admin-handler.js') }}"></script>
+    <!-- Scripts -->
 </body>
 
 </html>

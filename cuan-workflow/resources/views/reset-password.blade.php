@@ -110,7 +110,19 @@
         </div>
 
         <!-- Reset Form -->
-        <form id="reset-form" class="space-y-5 hidden">
+        <form id="reset-form" class="space-y-5">
+            <input type="hidden" id="token" value="{{ $token }}">
+            
+            <!-- Email (Required for Laravel Password Broker) -->
+            <div>
+                 <label class="block text-xs font-bold uppercase text-emerald-500/80 mb-1 ml-1 tracking-wider">Email Address</label>
+                 <div class="relative">
+                    <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    <input type="email" id="input-email" required
+                        class="w-full input-glass rounded-xl pl-11 pr-4 py-3.5 text-white placeholder-slate-500 focus:outline-none"
+                        placeholder="Confirm your email">
+                </div>
+            </div>
             <!-- New Password -->
             <div>
                 <label class="block text-xs font-bold uppercase text-emerald-500/80 mb-1 ml-1 tracking-wider">New
@@ -162,9 +174,105 @@
     </div>
 
     <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
-    <script type="module" src="{{ asset('assets/js/core/reset-handler.js') }}"></script>
+
+    <script type="module">
+        import { api } from '/assets/js/services/api.js';
+        import { Toast } from '/assets/js/components/toast-notification.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Remove mock states
+            document.getElementById('verifying-state').classList.add('hidden');
+            document.getElementById('reset-form').classList.remove('hidden');
+
+            const form = document.getElementById('reset-form');
+            const token = document.getElementById('token').value;
+            const btnReset = document.getElementById('btn-reset');
+            const spinner = document.getElementById('loading-spinner');
+
+            // Password matcher logic
+            const p1 = document.getElementById('input-new-pass');
+            const p2 = document.getElementById('input-confirm-pass');
+            const matchMsg = document.getElementById('password-match-msg');
+            const strengthBar = document.getElementById('strength-bar');
+            const strengthText = document.getElementById('strength-text');
+
+            const checkMatch = () => {
+                if (p2.value && p1.value !== p2.value) {
+                    matchMsg.classList.remove('hidden');
+                    btnReset.disabled = true;
+                } else {
+                    matchMsg.classList.add('hidden');
+                    btnReset.disabled = false;
+                }
+            };
+
+            const checkStrength = (password) => {
+                let strength = 0;
+                if (password.length > 5) strength += 20;
+                if (password.length > 10) strength += 20;
+                if (/[A-Z]/.test(password)) strength += 20;
+                if (/[0-9]/.test(password)) strength += 20;
+                if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+
+                strengthBar.style.width = strength + '%';
+                
+                if (strength < 40) {
+                    strengthBar.className = 'h-full bg-rose-500 w-0 transition-all duration-300';
+                    strengthText.innerText = 'WEAK';
+                    strengthText.className = 'font-bold text-rose-500';
+                } else if (strength < 80) {
+                    strengthBar.className = 'h-full bg-amber-500 w-0 transition-all duration-300';
+                    strengthText.innerText = 'MEDIUM';
+                    strengthText.className = 'font-bold text-amber-500';
+                } else {
+                    strengthBar.className = 'h-full bg-emerald-500 w-0 transition-all duration-300';
+                    strengthText.innerText = 'STRONG';
+                    strengthText.className = 'font-bold text-emerald-500';
+                }
+            };
+
+            p1.addEventListener('input', (e) => {
+                checkStrength(e.target.value);
+                checkMatch();
+            });
+            p2.addEventListener('input', checkMatch);
+
+            // Submit Logic
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const email = document.getElementById('input-email').value;
+                const password = p1.value;
+                const password_confirmation = p2.value;
+
+                btnReset.disabled = true;
+                spinner.classList.remove('hidden');
+                btnReset.querySelector('span').innerText = 'Updating...';
+
+                try {
+                    const response = await api.post('/reset-password', {
+                        token,
+                        email,
+                        password,
+                        password_confirmation
+                    });
+
+                    Toast.success(response.message || "Password successfully reset!");
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+
+                } catch (error) {
+                    console.error(error);
+                    Toast.error(error.message || "Failed to reset password.");
+                    btnReset.disabled = false;
+                    spinner.classList.add('hidden');
+                    btnReset.querySelector('span').innerText = 'Update Password';
+                }
+            });
+        });
+    </script>
     <script>
         // Toggle Password View
         document.getElementById('toggle-new-pass').addEventListener('click', function () {
