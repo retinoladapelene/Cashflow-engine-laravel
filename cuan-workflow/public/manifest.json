@@ -1,0 +1,20 @@
+{
+  "name": "CuanCapital CashFlow Machine",
+  "short_name": "CuanCapital",
+  "start_url": "./Index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "assets/icon/logo-2.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "assets/icon/logo-2.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

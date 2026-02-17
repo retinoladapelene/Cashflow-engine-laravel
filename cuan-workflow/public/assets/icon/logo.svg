@@ -1,0 +1,82 @@
+<svg width="450" height="150" viewBox="0 0 450 150" xmlns="http://www.w3.org/2000/svg">
+  <!-- Symbol Group -->
+  <!-- Center symbol at (60, 75). Width of symbol is roughly 80px. -->
+  <g transform="translate(60, 75)">
+    
+    <!-- C Shapes -->
+    <!-- Requirement: "sejajar horizontal" (Horizontally Aligned) -->
+    <!-- I will place them side-by-side on the x-axis, centered on y=0 (relative to group) -->
+    <!-- C1 (Left, U shape): x = -offset -->
+    <!-- C2 (Right, n shape): x = +offset -->
+    <!-- If offset is 0, they are concentric circles (top/bottom halves). 
+         If offset is large, they are [U][n].
+         "Saling bertumpuk" / Interlocking usually implies overlap.
+         Let's try a small offset of say 20px so they "lock".
+         Or maybe no offset (concentric)? 
+         "Sejajar horizontal" means aligned on the horizontal axis. 
+         Let's assume concentric for maximum "interlocking" effect around the dollar line.
+         Or maybe side-by-side like previous iteration but on same Y?
+         The user asked to correct the previous iteration where I had shifted them vertically.
+         So I will align them vertically (y=0) and keep horizontal separation.
+         Let's separate them slightly so the vertical line passes between? No, vertical line cuts intersection.
+         I'll overlap them by setting their centers close.
+         C1 Center: (-15, 0)
+         C2 Center: (15, 0)
+         Vertical line at x=0.
+    -->
+    
+    <!-- First C (Left, U shape) -->
+    <!-- Center (-15, 0). Normal U shape is top gap? 
+         Wait, previous logic:
+         Left C (starts facing right) -> Rotate -90 (Left) -> Opening is UP. (U shape)
+         Right C (starts facing right) -> Rotate 90 (Right) -> Opening is DOWN. (n shape)
+    -->
+    <!-- U Shape: Arc from left(-r) to right(+r) passing through bottom. 
+         Path: M -r 0 A r r 0 1 0 r 0 (Large arc flag 0? No, half circle is 0? Dependent on sweep).
+         Let's draw from left (-35) to right (35) via bottom.
+         M -35 0 A 35 35 0 0 0 35 0 (sweep 0 is counter-clockwise? Let's check).
+         Standard SVG arc: A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+         From (-35,0) to (35,0). 
+         Sweep 0 -> shortest arc? If exactly diameter, both arcs are equal.
+         Let's use bottom point (0, 35) as intermediate if needed, or just large arc.
+         Actually, U shape needs bottom part. 
+         M -35 -10 (start high) -> line down? No, circular C.
+         Let's use the full circle path with a cut.
+         GAP is at TOP.
+         Start Angle: -150 deg (top left). End Angle: -30 deg (top right).
+         Path moves from -30 to -150 (counter clockwise)?
+         Let's just use the previous path logic which was an arc.
+         
+         Previous path: M -24.7 -15 A ...
+         That was for Gap Top.
+         Let's reuse that shape but position it at (-15, 0).
+    -->
+    <path d="M -39.7 -15 A 35 35 0 1 0 9.7 -15" 
+          fill="none" stroke="#0F172A" stroke-width="12" stroke-linecap="round" />
+
+    <!-- Second C (Right, n shape) -->
+    <!-- Helper: Center (15, 0). Gap Bottom.
+         Uses previous path logic for Gap Bottom.
+         Previous: M -24.7 15 A ... (Centered at 0, -10).
+         Now centered at (15, 0).
+         Shift x by 15. -24.7 + 15 = -9.7. 
+         24.7 + 15 = 39.7.
+    -->
+    <path d="M -9.7 15 A 35 35 0 1 1 39.7 15"
+          fill="none" stroke="#0F172A" stroke-width="12" stroke-linecap="round" />
+
+    <!-- Dollar Core: Vertical Line -->
+    <!-- Centered at x=0 -->
+    <!-- Length: 100px? (-50 to 50) -->
+    <line x1="0" y1="-50" x2="0" y2="50" stroke="#059669" stroke-width="12" stroke-linecap="round" />
+  
+  </g>
+
+  <!-- Text Group -->
+  <!-- "CuanCapital" - No Space -->
+  <!-- "Cuan": Bold, Slate 900 (#0F172A) -->
+  <!-- "Capital": Light, Emerald 600 (#059669) -->
+  <text x="140" y="90" font-family="Arial, Helvetica, sans-serif" font-size="48">
+    <tspan font-weight="bold" fill="#0F172A">Cuan</tspan><tspan font-weight="normal" fill="#059669">Capital</tspan>
+  </text>
+</svg>
