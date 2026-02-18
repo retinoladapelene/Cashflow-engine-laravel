@@ -10,6 +10,8 @@ class MentorLab {
     constructor() {
         this.mode = 'optimizer'; // 'optimizer' or 'planner'
         this.baseline = null;
+        this.optimizerResult = null;
+        this.plannerResult = null;
         this.updateTimeout = null;
 
         this.init();
@@ -48,6 +50,47 @@ class MentorLab {
         if (btnUpsell) {
             btnUpsell.addEventListener('click', () => this.simulateUpsell());
         }
+
+        // RESTORE SESSION
+        this.restoreSession();
+    }
+
+    async restoreSession() {
+        try {
+            const response = await api.get('/mentor/simulation/latest');
+            if (response && response.success) {
+
+                // Store Key Results
+                // Note: The backend only returns the LATEST simulation. 
+                // It doesn't return separate results for optimizer and planner if they were different sessions.
+                // We'll just assume the latest one applies to its mode.
+                if (response.mode === 'optimizer') {
+                    this.optimizerResult = response;
+                } else {
+                    this.plannerResult = response;
+                }
+
+                // Restore Inputs
+                const input = response.input;
+                if (response.mode === 'optimizer') {
+                    if (select('#opt-traffic')) select('#opt-traffic').value = input.traffic;
+                    if (select('#opt-conversion')) select('#opt-conversion').value = input.conversion;
+                    if (select('#opt-price')) select('#opt-price').value = input.price;
+                    if (select('#opt-cost')) select('#opt-cost').value = input.cost;
+                    if (select('#opt-fixed')) select('#opt-fixed').value = input.fixed_cost;
+                } else {
+                    // Start Planner inputs
+                    if (select('#plan-target')) select('#plan-target').value = input.target_revenue;
+                    // Only specific fields map directly back for planner if we reverse logic. 
+                    // For now just ensure target is there.
+                }
+
+                // Restore Mode (and render)
+                if (response.mode) this.switchMode(response.mode);
+            }
+        } catch (e) {
+            console.log("No previous session found or auth error", e);
+        }
     }
 
     switchMode(mode) {
@@ -71,18 +114,30 @@ class MentorLab {
         select('#optimizer-inputs').classList.toggle('hidden', mode !== 'optimizer');
         select('#planner-inputs').classList.toggle('hidden', mode !== 'planner');
 
-        if (mode === 'planner') {
-            this.loadPreset(select('#planner-type').value);
-        }
+        // Logic: Restore Dashboard if result exists for this mode
+        const storedResult = (mode === 'optimizer') ? this.optimizerResult : this.plannerResult;
 
-        // Hide Dashboard on mode switch
-        select('#mentor-board-container').classList.add('min-h-[600px]'); // Keep height
-        select('#mentor-dashboard').classList.add('hidden');
+        if (storedResult) {
+            this.baseline = storedResult.baseline;
+            this.renderDashboard(storedResult, false);
+        } else {
+            // Hide Dashboard if no data for this mode yet
+            select('#mentor-board-container').classList.add('min-h-[600px]'); // Keep height
+            select('#mentor-dashboard').classList.add('hidden');
+
+            // Should we load preset? Only if planner and no result
+            if (mode === 'planner') {
+                const currentType = select('#planner-type').value;
+                if (!this.plannerResult) {
+                    this.loadPreset(currentType);
+                }
+            }
+        }
     }
 
     async loadPreset(type) {
         try {
-            const data = await api.get(`/mentor/preset?type=${type}`, { useApiPrefix: false });
+            const data = await api.get(`/mentor/preset?type=${type}`);
             select('#planner-conversion').value = data.conversion;
             select('#planner-margin').value = (data.margin * 100).toFixed(0);
         } catch (e) {
@@ -133,12 +188,18 @@ class MentorLab {
                     target_revenue: targetIncome // Pass for feasibility check
                 };
             }
-
-            // Use Web Route (Session Auth)
-            const response = await api.post('/mentor/calculate', payload, { useApiPrefix: false });
+            // Use API Route (Sanctum Auth)
+            const response = await api.post('/mentor/calculate', payload);
             this.baseline = response.baseline;
 
-            this.renderDashboard(response);
+            // Save to local persistence var
+            if (this.mode === 'optimizer') {
+                this.optimizerResult = response;
+            } else {
+                this.plannerResult = response;
+            }
+
+            this.renderDashboard(response, false);
 
         } catch (e) {
             console.error(e);
@@ -148,7 +209,7 @@ class MentorLab {
         }
     }
 
-    renderDashboard(data) {
+    renderDashboard(data, allowReset = true) {
         const d = select('#mentor-dashboard');
         d.classList.remove('hidden');
 
@@ -205,6 +266,7 @@ class MentorLab {
 
             select('#plan-units').innerText = data.baseline.units_sold.toLocaleString();
             select('#plan-traffic').innerText = data.baseline.traffic.toLocaleString();
+            select('#plan-conversion').innerText = data.baseline.conversion_rate.toFixed(1) + '%';
 
             // Est Budget (Assume CPC 2000 for now or logic?)
             // Let's take global CPC assumption or just placeholder logic
@@ -232,7 +294,9 @@ class MentorLab {
         }
 
         // Reset Sliders & Upsell
-        this.resetSliders();
+        if (allowReset) {
+            this.resetSliders();
+        }
         select('#upsell-result').classList.add('hidden');
     }
 
@@ -293,8 +357,8 @@ class MentorLab {
                 changes: changes
             };
 
-            // Use Web Route
-            const response = await api.post('/mentor/simulate', payload, { useApiPrefix: false });
+            // Use API Route
+            const response = await api.post('/mentor/simulate', payload);
 
             // Update Projected Revenue in UI
             const sim = response.simulation;
@@ -336,8 +400,8 @@ class MentorLab {
                 take_rate: rate
             };
 
-            // Use Web Route
-            const response = await api.post('/mentor/upsell', payload, { useApiPrefix: false });
+            // Use API Route
+            const response = await api.post('/mentor/upsell', payload);
             const data = response.upsell;
 
             select('#upsell-result').classList.remove('hidden');

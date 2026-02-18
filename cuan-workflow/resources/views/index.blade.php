@@ -6,6 +6,104 @@
         .locked {
             display: none !important;
         }
+
+        /* Custom Dropdown Styles */
+        .custom-dropdown {
+            position: relative;
+            width: auto;
+            min-width: 100px;
+        }
+
+        .dropdown-btn {
+            width: 100%;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .dark .dropdown-btn {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #f1f5f9;
+        }
+
+        .dropdown-btn:hover {
+            border-color: #10b981;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 140px;
+            overflow: hidden;
+        }
+
+        .dark .dropdown-menu {
+            background-color: #1e293b;
+            border-color: #334155;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 0.6rem 1rem;
+            font-size: 0.75rem;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .dark .dropdown-item {
+            color: #94a3b8;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f5f9;
+            color: #10b981;
+            padding-left: 1.25rem;
+        }
+
+        .dark .dropdown-item:hover {
+            background-color: #334155;
+            color: #10b981;
+        }
+
+        .dropdown-item.active {
+            background-color: #ecfdf5;
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        .dark .dropdown-item.active {
+            background-color: #064e3b;
+            color: #34d399;
+        }
     </style>
     <script type="module">
         import { initAuthListener } from './assets/js/core/auth-engine.js';
@@ -14,6 +112,11 @@
 
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <script>
+        window.savedPlannerData = @json($latestSession);
+        window.savedSimulationData = @json($latestSimulation);
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CuanCapital - Cashflow Engine - Business Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -116,7 +219,7 @@
             </div>
 
             <p class="text-slate-500 font-sans text-xs font-medium tracking-[0.2em] animate-pulse uppercase">
-                Memuat Mesin Cuan...</p>
+                Lagi Setup Mesin Cuan...</p>
         </div>
     </div>
 
@@ -137,20 +240,26 @@
                     </a>
                     <button id="start-tour"
                         class="p-2 text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none"
-                        title="Panduan Tour">
+                        title="Butuh Insight?">
                         <i class="fas fa-circle-question text-xl"></i>
                     </button>
-                    <select id="currency-selector"
-                        class="bg-slate-100 dark:bg-slate-800 border-none text-slate-900 dark:text-white text-xs md:text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 p-2 cursor-pointer font-bold">
-                        <option value="IDR">IDR (Rp)</option>
-                        <option value="USD">USD ($)</option>
-                        <option value="EUR">EUR (€)</option>
-                        <option value="GBP">GBP (£)</option>
-                        <option value="MYR">MYR (RM)</option>
-                        <option value="SGD">SGD (S$)</option>
-                        <option value="AUD">AUD (A$)</option>
-                        <option value="JPY">JPY (¥)</option>
-                    </select>
+                    <div class="custom-dropdown" id="dropdown-currency">
+                        <button class="dropdown-btn" type="button">
+                            <span class="selected-value">IDR (Rp)</span>
+                            <i class="fas fa-chevron-down text-[10px] ml-2"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item active" data-value="IDR">IDR (Rp)</div>
+                            <div class="dropdown-item" data-value="USD">USD ($)</div>
+                            <div class="dropdown-item" data-value="EUR">EUR (€)</div>
+                            <div class="dropdown-item" data-value="GBP">GBP (£)</div>
+                            <div class="dropdown-item" data-value="MYR">MYR (RM)</div>
+                            <div class="dropdown-item" data-value="SGD">SGD (S$)</div>
+                            <div class="dropdown-item" data-value="AUD">AUD (A$)</div>
+                            <div class="dropdown-item" data-value="JPY">JPY (¥)</div>
+                        </div>
+                        <input type="hidden" id="currency-selector" value="IDR">
+                    </div>
                     <!-- Settings Dropdown -->
                     <div class="relative">
                         <button id="settings-menu-btn"
@@ -211,7 +320,7 @@
                         <img id="hero-avatar" src="" alt="Profile" 
                              class="w-14 h-14 rounded-full object-cover border-2 border-emerald-500 shadow-md p-0.5 bg-white dark:bg-slate-800">
                         <div>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-0.5">Welcome back,</p>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-0.5">Halo lagi, Sobat Cuan! 👋</p>
                             <h3 id="greeting-text" class="text-xl font-bold text-slate-900 dark:text-white leading-none"></h3>
                         </div>
                     </div>
@@ -220,8 +329,7 @@
                         class="inline-flex items-center px-4 py-1.5 rounded-full border border-emerald-100 bg-emerald-50 dark:bg-emerald-900/30 dark:border-emerald-800 backdrop-blur-sm">
                         <span class="flex h-2 w-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
                         <span
-                            class="text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Bukan
-                            Sekadar Motivasi</span>
+                            class="text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Bisnis Valid, Bukan Cuma Omon-Omon</span>
                     </div>
 
                     <h1
@@ -234,9 +342,8 @@
                     </h1>
 
                     <p class="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl leading-loose">
-                        Berhenti menebak-nebak nasib bisnis Anda. Gunakan <strong>Framework CuanCapital</strong> yang
-                        sudah teruji untuk membangun mesin uang yang <strong>Predictable</strong> &
-                        <strong>Scalable</strong>. Tanpa Basa-basi.
+                        Stop nebak-nebak soal bisnis. Gunakan <strong>Framework CuanCapital</strong> yang sudah terbukti untuk bikin mesin profit yang <strong>konsisten</strong> dan bisa 
+                        <strong>berkembang</strong>
                     </p>
 
                     <div
@@ -353,276 +460,413 @@
         </section>
 
         @if(($settings['feature_calculator'] ?? '1') == '1')
-        <section id="goal-planner"
-            class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-3">
-            <div class="p-8 lg:p-10 bg-slate-900 dark:bg-slate-950 text-white space-y-6">
-                <div>
-                    <h3 class="text-2xl font-bold">Reverse Goal Planner <br><span
-                            class="text-emerald-400 text-sm font-mono tracking-widest uppercase">Precision
-                            Edition</span></h3>
-                    <p class="text-slate-400 text-sm mt-4 leading-relaxed">
-                        Set Target. Biar Data yang Bicara. <br>
-                        Breakdown traffic & sales yang wajib dikejar. <span class="text-emerald-400 font-bold">No
-                            guessing.</span>
-                    </p>
+        <section id="goal-planner" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden mb-12">
+            <div class="p-8 lg:p-10">
+                <div class="text-center mb-10">
+                    <h3 class="text-3xl font-bold text-slate-900 dark:text-white">Reverse Goal Planner <span class="text-emerald-500">2.0</span></h3>
+                    <p class="text-slate-500 dark:text-slate-400 mt-2">Design bisnis impian sesuai goals hidup kamu. Bukan sebaliknya.</p>
                 </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-[10px] font-black text-emerald-400 uppercase tracking-wider">Mau Cuan Berapa?
-                            <span class="currency-label">(IDR)</span></label>
+                <form id="reverse-planner-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Business Model -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center">
+                            Model Bisnis
+                            <i class="fas fa-info-circle ml-1 cursor-pointer text-slate-300 hover:text-emerald-500 transition-colors help-icon" data-term="business_model"></i>
+                        </label>
+                        <select id="rp-model" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                            <option value="dropship">Dropship (Low Margin, High Vol)</option>
+                            <option value="digital">Digital Product (High Margin)</option>
+                            <option value="service" selected>Service / Agency (High Ticket)</option>
+                            <option value="stock">Stock / Retail (Avg Margin)</option>
+                            <option value="affiliate">Affiliate (No Product)</option>
+                        </select>
+                    </div>
 
-                        <div class="relative mt-1">
-                            <input type="number" id="goal-income" placeholder="10000000"
-                                class="w-full bg-white/10 backdrop-blur-sm border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono text-lg font-bold transition-all">
-                            <span
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 pointer-events-none currency-label">IDR</span>
+                    <!-- Target Profit -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center">
+                            Target Cuan Bulanan
+                            <i class="fas fa-info-circle ml-1 cursor-pointer text-slate-300 hover:text-emerald-500 transition-colors help-icon" data-term="target_profit"></i>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">Rp</span>
+                            <input type="number" id="rp-target-profit" placeholder="10000000" required
+                                class="w-full pl-12 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Capital Available -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center">
+                            Modal Ready
+                            <i class="fas fa-info-circle ml-1 cursor-pointer text-slate-300 hover:text-emerald-500 transition-colors help-icon" data-term="capital_available"></i>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">Rp</span>
+                            <input type="number" id="rp-capital" placeholder="5000000" required
+                                class="w-full pl-12 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Deadline Target (Hari)</label>
+                        <input type="number" id="rp-timeline" value="30" placeholder="30" required
+                            class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+
+                    <!-- Selling Price Content -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center">
+                            Harga Jual (Avg)
+                            <i class="fas fa-info-circle ml-1 cursor-pointer text-slate-300 hover:text-emerald-500 transition-colors help-icon" data-term="selling_price"></i>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">Rp</span>
+                            <input type="number" id="rp-price" placeholder="150000" required
+                                class="w-full pl-12 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-mono font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Hours Available -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Daily Grind Time (Jam)</label>
+                        <input type="number" id="rp-hours" value="4" max="24" required
+                            class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+
+                    <!-- Traffic Strategy -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center">
+                            Strategi Traffic
+                            <i class="fas fa-info-circle ml-1 cursor-pointer text-slate-300 hover:text-emerald-500 transition-colors help-icon" data-term="traffic_strategy"></i>
+                        </label>
+                        <div class="custom-dropdown" id="dropdown-rp-strategy">
+                            <button class="dropdown-btn" type="button">
+                                <span class="selected-value">Paid Ads (Fast, Capital Heavy)</span>
+                                <i class="fas fa-chevron-down text-[10px] ml-2"></i>
+                            </button>
+                            <div class="dropdown-menu !right-auto !left-0 w-full">
+                                <div class="dropdown-item active" data-value="ads">Paid Ads (Fast, Capital Heavy)</div>
+                                <div class="dropdown-item" data-value="organic">Organic Content (Slow, Time Heavy)</div>
+                                <div class="dropdown-item" data-value="hybrid">Hybrid (Balanced)</div>
+                            </div>
+                            <input type="hidden" id="rp-strategy" value="ads">
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex items-end">
+                        <button type="submit" id="rp-calculate-btn"
+                            class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-500/30 transition-all transform hover:-translate-y-1">
+                            <i class="fas fa-rocket mr-2"></i> Lets Go! Generate Blueprint
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Container (Mentally Safe Redesign) -->
+                <div id="rp-results" class="hidden mt-12 pt-10 border-t border-slate-200 dark:border-slate-700 animate-fade-in">
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Left: Simplified Milestones (Keep useful numbers) -->
+                        <div class="space-y-6">
+                            <h4 class="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                                <i class="fas fa-flag-checkered text-slate-400"></i> Target Milestones
+                            </h4>
+                            
+                            <div class="bg-slate-50 dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+                                <div>
+                                    <p class="text-xs text-slate-500 uppercase font-bold">Sales Target</p>
+                                    <div class="flex items-baseline gap-2">
+                                        <p id="rp-req-units" class="text-xl font-black text-slate-800 dark:text-white mt-1">0 Units</p>
+                                        <span class="text-xs text-slate-400">/ bulan</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 font-medium">~ <span id="rp-daily-units">0</span> sales/hari</p>
+                                </div>
+                                <div class="w-full h-px bg-slate-200 dark:bg-slate-700"></div>
+                                <div>
+                                    <p class="text-xs text-slate-500 uppercase font-bold">Kebutuhan Iklan</p>
+                                    <p id="rp-req-budget" class="text-xl font-black text-slate-800 dark:text-white mt-1">Rp 0</p>
+                                    <p class="text-xs text-slate-400">Total budget selama periode</p>
+                                </div>
+                                <div class="w-full h-px bg-slate-200 dark:bg-slate-700"></div>
+                                <div>
+                                    <p class="text-xs text-slate-500 uppercase font-bold">Traffic Needed</p>
+                                    <p id="rp-req-traffic" class="text-xl font-black text-slate-800 dark:text-white mt-1">0 Visitors</p>
+                                </div>
+                            </div>
                         </div>
 
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-emerald-400 uppercase tracking-wider">Harga Produk
-                            Kamu
-                            <span class="currency-label">(IDR)</span></label>
+                        <!-- Right: Psychology Layer (Goal Status & Guide) -->
+                        <div class="lg:col-span-2 space-y-6">
+                            
+                            <!-- Block 1: Goal Status -->
+                            <div id="rp-status-card" class="bg-white dark:bg-slate-800 p-6 rounded-2xl border-l-4 shadow-sm transition-colors duration-300">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Status Goals Kamu</p>
+                                        <h3 id="rp-goal-status" class="text-2xl font-black text-slate-900 dark:text-white mb-2">Lagi Ngitung...</h3>
+                                        <p id="rp-constraint-msg" class="text-sm text-slate-600 dark:text-slate-300">Cek ombak dulu...</p>
+                                    </div>
+                                    <div id="rp-status-icon" class="text-4xl opacity-20">
+                                        <i class="fas fa-circle-notch fa-spin"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end">
+                                    <button id="rp-why-btn" class="text-xs font-bold text-slate-400 hover:text-emerald-500 underline decoration-dotted transition-colors">
+                                        Kenapa status gue begini?
+                                    </button>
+                                </div>
+                            </div>
 
-                        <div class="relative mt-1">
-                            <input type="number" id="goal-price" placeholder="200000"
-                                class="w-full bg-white/10 backdrop-blur-sm border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono text-lg font-bold transition-all">
-                            <span
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 pointer-events-none currency-label">IDR</span>
+                            <!-- Block 2: Focus / Learning Moment -->
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-2xl border border-blue-100 dark:border-blue-800">
+                                <h4 class="font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2 text-sm uppercase">
+                                    <i class="fas fa-lightbulb text-blue-500"></i> Insight Mentor
+                                </h4>
+                                <p id="rp-learning-moment" class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    Bocoran insight bakal muncul di sini.
+                                </p>
+                            </div>
+
+                            <!-- Block 3: Safe Recommendations -->
+                            <div id="rp-recommendations-box" class="hidden">
+                                <h4 class="font-bold text-slate-800 dark:text-white mb-3 text-sm uppercase tracking-wide">
+                                    Saran Penyesuaian (Opsional)
+                                </h4>
+                                <div id="rp-rec-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Buttons injected by JS -->
+                                </div>
+                            </div>
+
                         </div>
-
-                    </div>
-                    <button id="btn-calculate-goal"
-                        class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-xl font-bold transition shadow-lg shadow-emerald-900/50 hover:shadow-emerald-500/20 active:scale-95 text-sm tracking-wide uppercase">
-                        Generate Blueprint Saya
-                    </button>
-                </div>
-            </div>
-
-            <div
-                class="col-span-2 p-8 lg:p-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-emerald-50/30 dark:bg-slate-800/50">
-                <div class="space-y-6">
-                    <div
-                        class="p-4 bg-white dark:bg-slate-900 border border-emerald-100 dark:border-slate-700 rounded-2xl shadow-sm">
-                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-wider">Target Sales Wajib</p>
-                        <div id="goal-qty" class="text-3xl font-black text-slate-900 dark:text-white mt-1">50 Unit</div>
-                        <p class="text-emerald-600 dark:text-emerald-400 text-[10px] font-bold mt-1">Harus closing
-                            segini.</p>
                     </div>
 
-                    <div
-                        class="p-4 bg-white dark:bg-slate-900 border border-emerald-100 dark:border-slate-700 rounded-2xl shadow-sm">
-                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-wider">Traffic Minimal</p>
-                        <div id="goal-traffic" class="text-3xl font-black text-slate-900 dark:text-white mt-1">5.000
-                            Visitor</div>
-                        <p class="text-emerald-600 dark:text-emerald-400 text-[10px] font-bold mt-1">Jangan komplain
-                            sepi kalo traffic belum
-                            segini.</p>
+                    <!-- Hidden Modal for "Why?" transparency -->
+                    <div id="rp-why-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-fade-in">
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-sm w-full border border-slate-200 dark:border-slate-700">
+                            <h4 class="font-bold text-lg text-slate-900 dark:text-white mb-4">Analisis Cepat</h4>
+                            <div class="space-y-4 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Ketersediaan Modal</span>
+                                    <span id="rp-why-capital" class="font-bold text-slate-800 dark:text-white">--</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Ketersediaan Waktu</span>
+                                    <span id="rp-why-hours" class="font-bold text-slate-800 dark:text-white">--</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Kesehatan Margin</span>
+                                    <span id="rp-why-margin" class="font-bold text-slate-800 dark:text-white">--</span>
+                                </div>
+                            </div>
+                            <button id="rp-why-close" class="mt-6 w-full py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-200">Tutup</button>
+                        </div>
                     </div>
-
-                    <div class="p-4 bg-emerald-600 text-white rounded-2xl shadow-md border-t-4 border-emerald-400">
-                        <p class="text-emerald-100 text-[10px] font-black uppercase tracking-wider">Focus on This ONE
-                        <p id="goal-priority" class="text-sm font-bold mt-2 leading-relaxed">
-                            Manfaatkan Strategi Affiliate untuk mendapatkan traffic tersebut dengan cepat!
-                        </p>
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <canvas id="goalFunnelChart"></canvas>
                 </div>
             </div>
         </section>
 
-        <section id="calculator-section"
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-2xl font-black text-slate-900 dark:text-white">Simulasi Profit</h3>
-                        <p class="text-slate-500 dark:text-slate-400 text-sm">Mainkan angka, temukan
-                            <span class="font-bold text-slate-700 dark:text-slate-200">potensi profitmu.</span>
-                        </p>
-                    </div>
+        <section id="profit-simulator-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl relative overflow-hidden transition-all duration-500">
+            <!-- Grid Background -->
+            <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-900/[0.04] bg-[bottom_1px_center] pointer-events-none"></div>
 
-                    <div class="space-y-8">
-
-                        <div class="relative group">
-                            <div
-                                class="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                            </div>
-                            <h4
-                                class="text-sm font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <i class="fas fa-funnel-dollar"></i> Efisiensi Penjualan
-                            </h4>
-
-                            <div class="space-y-4">
-
-                                <div
-                                    class="bg-slate-900/50 p-4 rounded-2xl border border-slate-700/50 hover:border-blue-500/30 transition-colors">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <label class="text-[10px] font-black text-white uppercase tracking-widest">Harga
-                                            Jual</label>
-                                        <span id="price-val" class="text-sm font-bold text-white">Rp 150.000</span>
-                                    </div>
-                                    <input type="number" id="price-input" min="0" step="1000" placeholder="150000"
-                                        class="w-full bg-white/5 border border-slate-700 rounded-lg px-4 py-3 text-sm font-bold text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono">
-                                    <p class="text-[10px] text-white mt-2 italic"><i
-                                            class="fas fa-lightbulb text-yellow-500 mr-1"></i>Tip: Naikkan harga
-                                        jika
-                                        value produkmu tinggi dan brand kuat.</p>
-                                </div>
-
-                                <div
-                                    class="bg-slate-900/50 p-4 rounded-2xl border border-slate-700/50 hover:border-blue-500/30 transition-colors">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <label
-                                            class="text-[10px] font-black text-white uppercase tracking-widest">Conversion
-                                            Rate</label>
-                                        <span id="conv-val" class="text-sm font-bold text-white">2.0%</span>
-                                    </div>
-                                    <input type="range" id="conv-input" min="0.1" max="10" step="0.1" value="2.0"
-                                        class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400 transition-all">
-                                    <p class="text-[10px] text-slate-400 mt-2 italic flex flex-col gap-1">
-                                        <span class="flex justify-between w-full opacity-50">
-                                            <span><i class="fas fa-arrow-down text-rose-500 mr-1"></i>0.1%</span>
-                                            <span>10%<i class="fas fa-arrow-up text-emerald-500 ml-1"></i></span>
-                                        </span>
-                                        <span class="text-white"><i
-                                                class="fas fa-lightbulb text-yellow-500 mr-1"></i>Tip: Perbaiki
-                                            Copywriting & Offer untuk menaikkan konversi.</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="relative group">
-                            <div
-                                class="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-rose-500 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                            </div>
-                            <h4
-                                class="text-sm font-black text-rose-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <i class="fas fa-bullhorn"></i> Biaya Pemasaran
-                            </h4>
-
-                            <div class="space-y-4">
-
-                                <div
-                                    class="bg-slate-900/50 p-4 rounded-2xl border border-slate-700/50 hover:border-rose-500/30 transition-colors">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <label
-                                            class="text-[10px] font-black text-white uppercase tracking-widest">Traffic
-                                            / Visitor</label>
-                                        <span id="traffic-val" class="text-sm font-bold text-white">5.000</span>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <input type="range" id="traffic-input" min="100" max="100000" step="100"
-                                            value="1000"
-                                            class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-rose-500 hover:accent-rose-400 transition-all mt-2">
-                                        <input type="number" id="traffic-manual" placeholder="1000" min="0"
-                                            class="w-24 bg-white/5 border border-slate-700 rounded-lg px-2 py-1 text-xs font-bold text-white focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all font-mono">
-                                    </div>
-                                    <p class="text-[10px] text-white mt-2 italic"><i
-                                            class="fas fa-lightbulb text-yellow-500 mr-1"></i>Tip: Gunakan konten
-                                        viral
-                                        (Organic) atau iklan (Paid) untuk mendatangkan pengunjung.</p>
-                                </div>
-
-                                <div
-                                    class="bg-slate-900/50 p-4 rounded-2xl border border-slate-700/50 hover:border-rose-500/30 transition-colors">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <label class="text-[10px] font-black text-white uppercase tracking-widest">Ad
-                                            Spend (Budget Iklan)</label>
-                                        <span id="ad-spend-val" class="text-sm font-bold text-white">Rp 0</span>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <input type="range" id="ad-spend-input" min="0" max="100000000" step="50000"
-                                            value="0"
-                                            class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-rose-500 hover:accent-rose-400 transition-all mt-2">
-                                        <input type="number" id="ad-spend-manual" placeholder="0" min="0"
-                                            class="w-24 bg-white/5 border border-slate-700 rounded-lg px-2 py-1 text-xs font-bold text-white focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all font-mono">
-                                    </div>
-                                    <p class="text-[10px] text-white mt-2 italic"><i
-                                            class="fas fa-lightbulb text-yellow-500 mr-1"></i>Tip: Mulai budget
-                                        kecil,
-                                        scale up pelan-pelan. Budget tinggi = Lebih banyak traffic.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+            <div class="relative z-10">
+                <!-- Header -->
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-black text-slate-900 dark:text-white mb-2">Area Scale Up <span class="text-emerald-500">Paling Gacor</span></h2>
+                    <p class="text-slate-500 dark:text-slate-400">Pilih satu area buat difokuskan. Liat efek cuannya ke dompet kamu.</p>
                 </div>
 
-                <div
-                    class="relative bg-slate-900 dark:bg-slate-950 rounded-3xl p-6 md:p-8 text-white shadow-2xl shadow-emerald-900/20 border border-slate-800 flex flex-col justify-between h-full">
-
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6">
-                        <div class="w-full sm:w-auto">
-                            <p class="text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-1">Total
-                                Profit Bersih (Bulan Ini)</p>
-                            <h3 id="total-revenue"
-                                class="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white break-words">
-                                IDR
-                                3.000.000<span
-                                    class="currency-label text-sm sm:text-base font-medium opacity-50 ml-1">(IDR)</span>
-                            </h3>
-                            <p id="revenue-terbilang"
-                                class="text-[10px] sm:text-xs text-slate-400 font-medium mt-1 uppercase tracking-wide">
-                                Tiga Juta Rupiah
-                            </p>
-                        </div>
-                        <div class="text-left sm:text-right w-full sm:w-auto">
-                            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Sales</p>
-                            <p id="total-sales" class="text-lg sm:text-xl font-bold text-white">20 Unit</p>
-                        </div>
+                <!-- Gate Message (Hidden by default) -->
+                <div id="ps-gate-overlay" class="hidden absolute inset-0 z-50 bg-white/90 dark:bg-slate-900/90 flex items-center justify-center p-6 text-center backdrop-blur-sm">
+                    <div class="max-w-md">
+                        <div class="text-5xl mb-4 text-amber-500"><i class="fas fa-lock"></i></div>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Gaskeun Goal Dulu</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-6">Target bisnis kamu sekarang masih "Keberatan". Optimasi baru bakal legit kakamu fondasi bisnis kamu udah realistis. Coba adjust goals di atas dulu.</p>
+                        <button onclick="document.getElementById('reverse-planner-section').scrollIntoView({behavior: 'smooth'})" class="bg-emerald-600 text-white px-6 py-2 rounded-full font-bold hover:bg-emerald-700 transition">
+                            Sesuaikan Goal
+                        </button>
                     </div>
+                </div>
 
-                    <div class="bg-amber-900/20 p-4 rounded-xl border border-amber-500/30 mb-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-amber-200 text-[10px] font-black uppercase tracking-wider mb-1">✨
-                                    Magic
-                                    Number</p>
-                                <p id="magic-number" class="text-xl sm:text-2xl font-black text-amber-400">IDR
-                                    6.000.000
-                                </p>
-                                <p class="text-amber-200/70 text-[9px] mt-1">Revenue opportunity dengan asumsi
-                                    konversi
-                                    4% </p>
+                <!-- Layout: 2 Columns (Zones | Results) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    
+                    <!-- Left: Leverage Zones (Grid of 4) -->
+                    <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        
+                        <!-- Traffic Zone -->
+                        <div class="zone-card group relative bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border-2 border-transparent hover:border-blue-500 cursor-pointer transition-all duration-300" data-zone="traffic">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl text-blue-600 dark:text-blue-400">
+                                    <i class="fas fa-users text-xl"></i>
+                                </div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Perbesar (Scale)</span>
                             </div>
-
-                        </div>
-                    </div>
-
-                    <div class="relative w-full h-64 bg-slate-800/50 rounded-xl border border-slate-700/50 p-2 mb-4">
-                        <canvas id="profitChart"></canvas>
-                    </div>
-
-                    <div class="bg-emerald-900/30 p-4 rounded-xl border border-emerald-500/20">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                            <div class="w-full sm:w-auto">
-                                <p class="text-[10px] text-emerald-200 font-bold uppercase tracking-wider">Proyeksi
-                                    1
-                                    Tahun (Akumulasi)</p>
-                                <p id="yearly-profit"
-                                    class="text-base sm:text-lg font-black text-white mt-1 break-words">IDR
-                                    36.000.000<span
-                                        class="currency-label text-xs sm:text-sm font-medium opacity-50 ml-1">(IDR)</span>
-                                </p>
-                                <p id="yearly-terbilang"
-                                    class="text-[9px] sm:text-[10px] text-emerald-200/80 font-medium mt-1 uppercase tracking-wide">
-                                    Tiga Puluh Enam Juta Rupiah</p>
-                            </div>
-                            <div class="text-left sm:text-right w-full sm:w-auto">
-                                <span id="profit-growth-label"
-                                    class="inline-block text-[10px] sm:text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded whitespace-nowrap">+Stable
-                                    Growth</span>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Trafik</h3>
+                            <p class="text-xs text-slate-500 mb-4">Mendatangkan lebih banyak pengunjung.</p>
+                            
+                            <!-- Level Selection (Visible on Active) -->
+                            <div class="level-selector hidden mt-4 space-y-2 animate-fade-in">
+                                <p class="text-xs font-bold text-blue-500 mb-2">Pilih Tingkat Upaya:</p>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-blue-50 hover:border-blue-300 transition flex flex-col items-center" data-level="1">
+                                        <span>Tingkat 1</span>
+                                        <span class="font-medium opacity-60 mt-1">Organic (+10%)</span>
+                                    </button>
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-blue-50 hover:border-blue-300 transition flex flex-col items-center" data-level="2">
+                                        <span>Tingkat 2</span>
+                                        <span class="font-medium opacity-60 mt-1">Kampanye Iklan (+20%)</span>
+                                    </button>
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-blue-50 hover:border-blue-300 transition flex flex-col items-center" data-level="3">
+                                        <span>Tingkat 3</span>
+                                        <span class="font-medium opacity-60 mt-1">Agresif (+35%)</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Conversion Zone -->
+                        <div class="zone-card group relative bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border-2 border-transparent hover:border-emerald-500 cursor-pointer transition-all duration-300" data-zone="conversion">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl text-emerald-600 dark:text-emerald-400">
+                                    <i class="fas fa-magic text-xl"></i>
+                                </div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Optimasi</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Konversi</h3>
+                            <p class="text-xs text-slate-500 mb-4">Meningkatkan efektivitas penjualan.</p>
+                            
+                            <div class="level-selector hidden mt-4 space-y-2 animate-fade-in">
+                                <p class="text-xs font-bold text-emerald-500 mb-2">Pilih Tingkat Upaya:</p>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 hover:border-emerald-300 transition flex flex-col items-center" data-level="1">
+                                        <span>Tingkat 1</span>
+                                        <span class="font-medium opacity-60 mt-1">Optimasi UI (+5%)</span>
+                                    </button>
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 hover:border-emerald-300 transition flex flex-col items-center" data-level="2">
+                                        <span>Tingkat 2</span>
+                                        <span class="font-medium opacity-60 mt-1">Copywriting (+10%)</span>
+                                    </button>
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 hover:border-emerald-300 transition flex flex-col items-center" data-level="3">
+                                        <span>Tingkat 3</span>
+                                        <span class="font-medium opacity-60 mt-1">Sinkronisasi Funnel (+20%)</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Zone -->
+                        <div class="zone-card group relative bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border-2 border-transparent hover:border-amber-500 cursor-pointer transition-all duration-300" data-zone="pricing">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-xl text-amber-600 dark:text-amber-400">
+                                    <i class="fas fa-tag text-xl"></i>
+                                </div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Nilai (Value)</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Harga (Pricing)</h3>
+                            <p class="text-xs text-slate-500 mb-4">Menaikkan nilai jual produk.</p>
+                            
+                            <div class="level-selector hidden mt-4 space-y-2 animate-fade-in">
+                                <p class="text-xs font-bold text-amber-500 mb-2">Pilih Tingkat Upaya:</p>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-amber-50 hover:border-amber-300 transition flex flex-col items-center" data-level="1">
+                                        <span>Tingkat 1</span>
+                                        <span class="font-medium opacity-60 mt-1">Addon (+3%)</span>
+                                    </button>
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-amber-50 hover:border-amber-300 transition flex flex-col items-center" data-level="2">
+                                        <span>Tingkat 2</span>
+                                        <span class="font-medium opacity-60 mt-1">Premium (+7%)</span>
+                                    </button>
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-amber-50 hover:border-amber-300 transition flex flex-col items-center" data-level="3">
+                                        <span>Tingkat 3</span>
+                                        <span class="font-medium opacity-60 mt-1">Elite (+12%)</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cost Zone -->
+                        <div class="zone-card group relative bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border-2 border-transparent hover:border-rose-500 cursor-pointer transition-all duration-300" data-zone="cost">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="p-3 bg-rose-100 dark:bg-rose-900/30 rounded-xl text-rose-600 dark:text-rose-400">
+                                    <i class="fas fa-scissors text-xl"></i>
+                                </div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Efisiensi</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Cost (Biaya)</h3>
+                            <p class="text-xs text-slate-500 mb-4">Pangkas biaya biar margin makin tebel.</p>
+                            
+                            <div class="level-selector hidden mt-4 space-y-2 animate-fade-in">
+                                <p class="text-xs font-bold text-rose-500 mb-2">Pilih Tingkat Upaya:</p>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-rose-50 hover:border-rose-300 transition flex flex-col items-center" data-level="1">
+                                        <span>Tingkat 1</span>
+                                        <span class="font-medium opacity-60 mt-1">Sourcing (-5%)</span>
+                                    </button>
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-rose-50 hover:border-rose-300 transition flex flex-col items-center" data-level="2">
+                                        <span>Tingkat 2</span>
+                                        <span class="font-medium opacity-60 mt-1">Operasional Ramping (-10%)</span>
+                                    </button>
+                                    <button class="level-btn p-2 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-rose-50 hover:border-rose-300 transition flex flex-col items-center" data-level="3">
+                                        <span>Tingkat 3</span>
+                                        <span class="font-medium opacity-60 mt-1">Outsource (-15%)</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- Right: Intelligence Module (Result) -->
+                    <div class="lg:col-span-5 space-y-6">
+                        <!-- Default State -->
+                        <div id="ps-default-state" class="bg-slate-50 dark:bg-slate-900 text-slate-400 rounded-3xl p-8 border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-center h-full min-h-[300px]">
+                            <i class="fas fa-hand-pointer text-4xl mb-4 opacity-50"></i>
+                            <p class="text-sm font-medium">Klik salah satu zona di kiri<br>buat liat potensi cuan kamu.</p>
+                        </div>
+
+                        <!-- Result Card (Hidden by default) -->
+                        <div id="simulation-result" class="hidden bg-slate-900 text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden ring-1 ring-white/10 animate-fade-in">
+                            <!-- Decoration -->
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                            
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-2 mb-6">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                                    <span class="text-xs font-bold tracking-widest uppercase text-emerald-400">Potensi Hasil</span>
+                                </div>
+
+                                <div class="mb-8">
+                                    <p class="text-slate-400 text-xs uppercase font-bold mb-1">Estimasi Bonus Cuan</p>
+                                    <h3 id="ps-profit-range" class="text-3xl font-black text-white tracking-tight">Rp 0 - 0</h3>
+                                    <p id="ps-insight" class="text-sm text-slate-300 mt-2 italic">Klik lever buat liat dampaknya.</p>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 mb-6">
+                                    <div class="bg-white/5 p-4 rounded-2xl backdrop-blur-sm border border-white/10">
+                                        <p class="text-[10px] uppercase text-slate-400 font-bold mb-1">Tingkat Upaya (Effort)</p>
+                                        <p id="ps-effort" class="font-bold text-white">—</p>
+                                    </div>
+                                    <div class="bg-white/5 p-4 rounded-2xl backdrop-blur-sm border border-white/10">
+                                        <p class="text-[10px] uppercase text-slate-400 font-bold mb-1">Profil Resiko</p>
+                                        <p id="ps-risk" class="font-bold text-white">—</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl">
+                                    <p class="text-xs font-bold text-emerald-400 uppercase mb-1">Reflection (Jujurly)</p>
+                                    <p id="ps-reflection" class="text-sm text-white font-medium">Udah siap eksekusi belum?</p>
+                                </div>
+
+                                <button class="w-full mt-6 bg-white text-slate-900 font-bold py-3 rounded-xl hover:bg-slate-100 transition-colors">
+                                    Simpan Blueprint Ini <i class="fas fa-arrow-right ml-2 opacity-50"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -634,9 +878,9 @@
             <h3 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2 text-center">The Scaling
                 Arsenal</h3>
             <p class="text-center text-slate-500 dark:text-slate-400 mb-10 max-w-2xl mx-auto">
-                <span class="text-emerald-600 dark:text-emerald-400 font-bold">Jangan Perang Tanpa Senjata.</span>
-                Lengkapi strategi Anda dengan tools premium ini untuk <span
-                    class="text-slate-900 dark:text-white font-bold">akselerasi profit 2x lebih cepat</span>.
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold">Jangan Perang Tanpa Gear.</span>
+                Lengkapi strategi kamu pake tools premium ini buat <span
+                    class="text-slate-900 dark:text-white font-bold">akselerasi profit 2x lebih kenceng</span>.
             </p>
 
             <div class="md:hidden flex justify-center mb-6">
@@ -661,7 +905,7 @@
                     Business Simulation Lab <span class="bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-xs px-2 py-1 rounded-full align-top ml-2">Beta</span>
                 </h2>
                 <p class="mt-4 text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-                    Uji potensi bisnis Anda sebelum bakar uang. Optimasi strategi yang sudah jalan atau rencanakan bisnis baru dengan data.
+                    Uji potensi bisnis kamu sebelum bakar duit. Optimasi yang udah jalan atau plan bisnis baru pake data real.
                 </p>
             </div>
 
@@ -688,7 +932,7 @@
                         <div id="optimizer-inputs" class="space-y-4">
                             <div class="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl mb-4 border border-emerald-100 dark:border-emerald-800/50">
                                 <h4 class="text-sm font-bold text-emerald-800 dark:text-emerald-400 mb-1"><i class="fas fa-info-circle mr-1"></i> Mode Optimizer</h4>
-                                <p class="text-xs text-emerald-600 dark:text-emerald-500">Masukkan data real dari bisnis Anda saat ini untuk diagnosa bottleneck.</p>
+                                <p class="text-xs text-emerald-600 dark:text-emerald-500">Masukin data real bisnis kamu sekarang buat diagnosa bottleneck.</p>
                             </div>
 
                             <div>
@@ -721,16 +965,23 @@
                         <div id="planner-inputs" class="space-y-4 hidden">
                             <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl mb-4 border border-blue-100 dark:border-blue-800/50">
                                 <h4 class="text-sm font-bold text-blue-800 dark:text-blue-400 mb-1"><i class="fas fa-info-circle mr-1"></i> Mode Planner</h4>
-                                <p class="text-xs text-blue-600 dark:text-blue-500">Gunakan benchmark industri untuk simulasi bisnis baru Anda.</p>
+                                <p class="text-xs text-blue-600 dark:text-blue-500">Pake benchmark industri buat simulasi bisnis baru kamu.</p>
                             </div>
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tipe Bisnis</label>
-                                <select id="planner-type" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-blue-500">
-                                    <option value="digital">Produk Digital (E-course/Software)</option>
-                                    <option value="physical">Produk Fisik (Fashion/F&B)</option>
-                                    <option value="service">Jasa / Agency</option>
-                                </select>
+                                <div class="custom-dropdown" id="dropdown-planner-type">
+                                    <button class="dropdown-btn" type="button">
+                                        <span class="selected-value">Produk Digital (E-course/Software)</span>
+                                        <i class="fas fa-chevron-down text-[10px] ml-2"></i>
+                                    </button>
+                                    <div class="dropdown-menu !right-auto !left-0 w-full">
+                                        <div class="dropdown-item active" data-value="digital">Produk Digital (E-course/Software)</div>
+                                        <div class="dropdown-item" data-value="physical">Produk Fisik (Fashion/F&B)</div>
+                                        <div class="dropdown-item" data-value="service">Jasa / Agency</div>
+                                    </div>
+                                    <input type="hidden" id="planner-type" value="digital">
+                                </div>
                             </div>
                             
                             <div>
@@ -748,11 +999,11 @@
                                 <div class="grid grid-cols-2 gap-4 opacity-75">
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 mb-1">Est. Conversion (%)</label>
-                                        <input type="number" id="planner-conversion" disabled class="w-full bg-slate-100 dark:bg-slate-800 border-transparent rounded px-3 py-1.5 text-sm font-mono text-slate-600 cursor-not-allowed">
+                                        <input type="number" id="planner-conversion" disabled value="2.0" class="w-full bg-slate-100 dark:bg-slate-800 border-transparent rounded px-3 py-1.5 text-sm font-mono text-slate-600 cursor-not-allowed">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 mb-1">Est. Margin (%)</label>
-                                        <input type="number" id="planner-margin" disabled class="w-full bg-slate-100 dark:bg-slate-800 border-transparent rounded px-3 py-1.5 text-sm font-mono text-slate-600 cursor-not-allowed">
+                                        <input type="number" id="planner-margin" disabled value="40" class="w-full bg-slate-100 dark:bg-slate-800 border-transparent rounded px-3 py-1.5 text-sm font-mono text-slate-600 cursor-not-allowed">
                                     </div>
                                 </div>
                             </div>
@@ -776,8 +1027,8 @@
                             <div class="absolute inset-0 border-4 border-emerald-500 rounded-full border-t-transparent animate-spin"></div>
                             <i class="fas fa-brain absolute inset-0 flex items-center justify-center text-emerald-500 text-2xl animate-pulse"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800 dark:text-white animate-pulse mb-2" id="loading-text">Analyzing Business Structure...</h3>
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Please wait while we calculate your potential.</p>
+                        <h3 class="text-xl font-bold text-slate-800 dark:text-white animate-pulse mb-2" id="loading-text">Lagi Bedah Struktur Bisnis Kamu...</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Sabar ya, lagi ngitung potensi cuan kamu.</p>
                     </div>
 
                     <div id="mentor-dashboard" class="space-y-6 hidden">
@@ -787,7 +1038,7 @@
                             <div class="absolute top-0 right-0 p-4 opacity-10">
                                 <i class="fas fa-chart-line text-9xl text-slate-900 dark:text-white"></i>
                             </div>
-                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Financial Baseline</h3>
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Baseline Finansial</h3>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
                                 <div>
                                     <p class="text-xs text-slate-400 mb-1">Revenue</p>
@@ -826,7 +1077,7 @@
                                 </div>
                                 <span id="plan-feasibility" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase whitespace-nowrap">Analyzing...</span>
                             </div>
-                            <div class="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 text-center">
                                 <div class="bg-white dark:bg-slate-800 p-2 sm:p-3 rounded-xl shadow-sm">
                                     <p class="text-[10px] text-slate-400 uppercase font-bold truncate">Sales Needed</p>
                                     <h4 id="plan-units" class="text-sm sm:text-lg font-black text-slate-800 dark:text-white truncate">0</h4>
@@ -836,6 +1087,11 @@
                                     <p class="text-[10px] text-slate-400 uppercase font-bold truncate">Traffic Needed</p>
                                     <h4 id="plan-traffic" class="text-sm sm:text-lg font-black text-slate-800 dark:text-white truncate">0</h4>
                                     <p class="text-[10px] text-slate-400">visitors/mo</p>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-2 sm:p-3 rounded-xl shadow-sm">
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold truncate">Conv. Rate</p>
+                                    <h4 id="plan-conversion" class="text-sm sm:text-lg font-black text-slate-800 dark:text-white truncate">0%</h4>
+                                    <p class="text-[10px] text-slate-400">assumed</p>
                                 </div>
                                 <div class="bg-white dark:bg-slate-800 p-2 sm:p-3 rounded-xl shadow-sm">
                                     <p class="text-[10px] text-slate-400 uppercase font-bold truncate">Est. Ad Budget</p>
@@ -1009,25 +1265,26 @@
                             </button>
                         </div>
                         
-                        <!-- G. DYNAMIC ROADMAP (Hidden by Default) -->
-                        <div id="roadmap-container" class="hidden mt-8 border-t border-slate-200 dark:border-slate-700 pt-8">
-                            <div class="text-center mb-8">
-                                <h3 class="text-2xl font-black text-slate-900 dark:text-white">Your Personalized Roadmap</h3>
-                                <p class="text-slate-500 dark:text-slate-400">Step-by-step actions to reach your goals.</p>
-                            </div>
-                            
-                            <!-- Roadmap Steps Container -->
-                            <div id="roadmap-steps" class="max-w-3xl mx-auto space-y-0 relative">
-                                <!-- Vertical Connector Line (Absolute) -->
-                                <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700 -ml-px hidden md:block group-hover:bg-emerald-500 transition-colors"></div>
-                                
-                                <!-- Steps will be injected here via JS -->
-                            </div>
-                        </div>
+
 
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- H. ROADMAP SECTION (Full Width & Centered) -->
+    <section id="roadmap-container" class="hidden max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-white dark:bg-slate-900 rounded-3xl mt-12 shadow-sm border border-slate-100 dark:border-slate-800">
+        <div class="mb-12 text-center">
+            <h3 class="text-3xl font-black text-slate-900 dark:text-white flex items-center justify-center gap-3">
+                <i class="fas fa-map-signs text-emerald-500"></i>
+                Your Personalized Roadmap
+            </h3>
+            <p class="text-slate-500 dark:text-slate-400 mt-3 text-lg max-w-2xl mx-auto">Based on your simulation results, here are the step-by-step actions you need to reach your goals.</p>
+        </div>
+
+        <div id="roadmap-steps" class="relative space-y-8">
+            <!-- Steps rendered by JS -->
         </div>
     </section>
 
@@ -1093,7 +1350,7 @@
     <script>
         // Service Worker Registration
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
+            window.addEventListener('kamuad', () => {
                 navigator.serviceWorker.register('{{ asset('sw.js') }}')
                     .then(registration => {
                         console.log('SW registered:', registration);
@@ -1129,6 +1386,16 @@
 
     <script type="module" src="{{ asset('assets/js/features/mentor-lab.js') }}"></script>
     <script type="module" src="{{ asset('assets/js/features/roadmap-engine.js') }}"></script>
+    <script src="{{ asset('assets/js/reverse-goal-planner.js') }}"></script>
+    
+    <!-- Profit Simulator Config -->
+    <script>
+        window.profitSimulatorConfig = {
+            sessionId: "{{ session('reverse_goal_session_id') }}" // Or fetch from auth user latest
+        };
+    </script>
+    <script src="{{ asset('assets/js/profit-simulator.js') }}"></script>
+
     <script>
         // Settings Dropdown Logic
         const settingsBtn = document.getElementById('settings-menu-btn');
@@ -1149,6 +1416,9 @@
             });
         }
     </script>
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-24 md:bottom-10 right-4 z-[9999] flex flex-col gap-3 w-full max-w-sm pointer-events-none"></div>
+
 </body>
 
 </html>

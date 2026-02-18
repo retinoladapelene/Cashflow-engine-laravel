@@ -9,13 +9,28 @@ class BusinessController extends Controller
 {
     public function index(Request $request)
     {
-        $profile = $request->user()->businessProfile;
+        $settings = \App\Models\SystemSetting::all()->pluck('value', 'key');
         
-        if (!$profile) {
-            $profile = $request->user()->businessProfile()->create();
+        $latestSession = null;
+        $latestSimulation = null;
+
+        if (Auth::check()) {
+            $latestSession = \App\Models\ReverseGoalSession::where('user_id', Auth::id())
+                ->latest()
+                ->first();
+
+            if ($latestSession) {
+                $latestSimulation = \App\Models\ProfitSimulation::where('reverse_goal_session_id', $latestSession->id)
+                    ->latest()
+                    ->first();
+            }
         }
 
-        return response()->json($profile);
+        return view('index', [
+            'settings' => $settings,
+            'latestSession' => $latestSession,
+            'latestSimulation' => $latestSimulation
+        ]);
     }
 
     public function update(Request $request)

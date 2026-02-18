@@ -36,7 +36,7 @@ export const initAuthListener = async () => {
     if (token) {
         try {
             // Verify Token & Get User
-            const user = await api.get('/me');
+            const user = await api.get('/me', { useApiPrefix: true });
 
             // 1. Ban Check
             if (user.is_banned) {
@@ -96,7 +96,7 @@ export const initAuthListener = async () => {
 
 export const loginWithEmail = async (email, password) => {
     try {
-        const response = await api.post('/login', { email, password });
+        const response = await api.post('/login', { email, password }, { useApiPrefix: true });
 
         localStorage.setItem('auth_token', response.token);
 
@@ -111,7 +111,7 @@ export const registerWithEmail = async (name, email, password, username, whatsap
     try {
         const response = await api.post('/register', {
             name, email, password, username, whatsapp
-        });
+        }, { useApiPrefix: true });
 
         localStorage.setItem('auth_token', response.token);
 
@@ -123,7 +123,7 @@ export const registerWithEmail = async (name, email, password, username, whatsap
 
 export const logoutUser = async () => {
     try {
-        await api.post('/logout');
+        await api.post('/logout', {}, { useApiPrefix: true });
     } catch (e) {
         console.warn("Logout API failed, clearing local state anyway");
     }
@@ -253,7 +253,7 @@ const updateUIState = (isRegister) => {
 
 export const requestPasswordReset = async (email) => {
     try {
-        const response = await api.post('/forgot-password', { email });
+        const response = await api.post('/forgot-password', { email }, { useApiPrefix: true });
         return { success: true, message: response.message };
     } catch (error) {
         throw error;

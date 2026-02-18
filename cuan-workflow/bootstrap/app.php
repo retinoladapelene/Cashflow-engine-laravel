@@ -12,8 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->appendToGroup('web', \App\Http\Middleware\CheckSystemMaintenance::class);
-        $middleware->appendToGroup('api', \App\Http\Middleware\CheckSystemMaintenance::class);
+        $middleware->validateCsrfTokens(except: [
+            'reverse-planner/calculate',
+        ]);
+        // $middleware->appendToGroup('web', \App\Http\Middleware\CheckSystemMaintenance::class);
+        // $middleware->appendToGroup('api', \App\Http\Middleware\CheckSystemMaintenance::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

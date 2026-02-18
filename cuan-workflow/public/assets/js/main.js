@@ -6,6 +6,7 @@ import { initTheme } from './theme.js';
 import { startTour } from './tour.js';
 import { select, listen, showToast, showConfirm } from './utils/helpers.js';
 import { initScrollEffects, initBackToTop } from './ui.js';
+import { educationEngine } from './features/education-engine.js';
 
 // ... existing code ...
 
@@ -64,6 +65,64 @@ function initGreeting() {
     greetingContainer.classList.remove('hidden');
 }
 
+/**
+ * Initialize custom dropdown logic
+ */
+function initCustomDropdowns() {
+    const dropdowns = document.querySelectorAll('.custom-dropdown');
+
+    dropdowns.forEach(dropdown => {
+        const btn = dropdown.querySelector('.dropdown-btn');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        const items = dropdown.querySelectorAll('.dropdown-item');
+        const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+        const selectedValueSpan = dropdown.querySelector('.selected-value');
+
+        if (!btn || !menu) return;
+
+        // Toggle menu
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Close other dropdowns first
+            document.querySelectorAll('.dropdown-menu.show').forEach(m => {
+                if (m !== menu) m.classList.remove('show');
+            });
+            menu.classList.toggle('show');
+        });
+
+        // Handle item selection
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                const value = item.getAttribute('data-value');
+                const text = item.textContent;
+
+                // Update UI
+                if (selectedValueSpan) selectedValueSpan.textContent = text;
+                items.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                // Update hidden input and trigger events
+                if (hiddenInput) {
+                    hiddenInput.value = value;
+                    // Trigger native events so other scripts react (e.g., businessCore, mainController)
+                    hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+
+                // Close menu
+                menu.classList.remove('show');
+            });
+        });
+    });
+
+    // Close all dropdowns when clicking outside
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+            menu.classList.remove('show');
+        });
+    });
+}
+
 
 window.onload = async function () { // Make it async
     console.log('UI V.7 Initialized - Debugging Mode On');
@@ -88,6 +147,12 @@ window.onload = async function () { // Make it async
 
         // Initialize Core (Loads data from API)
         await businessCore.init();
+
+        // Initialize Education Engine
+        await educationEngine.init();
+
+        // Initialize custom dropdowns
+        initCustomDropdowns();
 
         // Initialize dynamic greeting
         initGreeting();

@@ -97,7 +97,7 @@ class BusinessCore {
     async loadFromApi() {
         this.isLoading = true;
         try {
-            const data = await api.get('/business');
+            const data = await api.get('/business', { useApiPrefix: true });
             if (data) {
                 // Map API response (snake_case) to State (camelCase)
                 this.state = {
@@ -148,7 +148,9 @@ class BusinessCore {
                 currency: this.state.currency
             };
 
-            await api.post('/business', payload);
+            await api.post('/business', payload, { useApiPrefix: true });
+
+            this.hasUnsavedChanges = false;
             console.log("Auto-saved to API");
         } catch (error) {
             console.error("Auto-save failed:", error);

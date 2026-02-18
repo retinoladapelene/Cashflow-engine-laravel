@@ -39,9 +39,9 @@
             <div class="flex justify-between h-16 items-center">
                 <a href="{{ route('index') }}" class="flex items-center gap-2 group">
                     <i class="fas fa-arrow-left text-slate-400 group-hover:text-emerald-500 transition-colors"></i>
-                    <span class="font-bold text-slate-700 dark:text-slate-300 group-hover:text-emerald-500 transition-colors">Back to Dashboard</span>
+                    <span class="font-bold text-slate-700 dark:text-slate-300 group-hover:text-emerald-500 transition-colors">Balik ke Dashboard</span>
                 </a>
-                <div class="text-lg font-bold">Account Settings</div>
+                <div class="text-lg font-bold">Pengaturan Akun</div>
                 <button id="btn-logout-nav" class="text-rose-500 hover:text-rose-600 font-medium text-sm">
                     <i class="fas fa-sign-out-alt mr-1"></i> Logout
                 </button>
@@ -56,7 +56,7 @@
             <!-- Sidebar Tabs -->
             <div class="md:col-span-1 space-y-2">
                 <button onclick="switchTab('profile')" id="tab-profile" class="w-full text-left px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
-                    <i class="fas fa-user mr-2"></i> Profile
+                    <i class="fas fa-user mr-2"></i> Profil Kamu
                 </button>
                 <button onclick="switchTab('preferences')" id="tab-preferences" class="w-full text-left px-4 py-3 rounded-xl font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200">
                     <i class="fas fa-sliders-h mr-2"></i> Preferences
@@ -65,7 +65,7 @@
                     <i class="fas fa-shield-alt mr-2"></i> Security
                 </button>
                 <button onclick="switchTab('system')" id="tab-system" class="w-full text-left px-4 py-3 rounded-xl font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200">
-                    <i class="fas fa-history mr-2"></i> Activity Log
+                    <i class="fas fa-history mr-2"></i> History Aktivitas
                 </button>
             </div>
 
@@ -75,7 +75,7 @@
                 <!-- Profile Tab -->
                 <div id="content-profile" class="space-y-6">
                     <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
-                        <h2 class="text-xl font-bold mb-6">Profile Information</h2>
+                        <h2 class="text-xl font-bold mb-6">Info Profil</h2>
                         
                         <form id="form-profile" class="space-y-4">
                             <div class="flex items-center gap-6 mb-6">
@@ -98,7 +98,7 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap</label>
                                     <input type="text" name="name" id="inp-name"
                                            class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500 focus:border-emerald-500">
                                 </div>
@@ -109,12 +109,12 @@
                                     <p id="error-username" class="text-rose-500 text-sm mt-1 hidden"></p>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">WhatsApp Number</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nomor WhatsApp</label>
                                     <input type="text" name="whatsapp" id="inp-whatsapp"
                                            class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500 focus:border-emerald-500">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email (Read Only)</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email (ReadOnly Cuy)</label>
                                     <input type="text" id="inp-email" readonly disabled
                                            class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 text-slate-500 cursor-not-allowed">
                                 </div>
@@ -122,7 +122,7 @@
 
                             <div class="pt-4 flex justify-end">
                                 <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-bold transition-colors shadow-lg shadow-emerald-500/20">
-                                    Save Changes
+                                    Simpan Perubahan
                                 </button>
                             </div>
                         </form>
@@ -132,7 +132,7 @@
                 <!-- Preferences Tab -->
                 <div id="content-preferences" class="space-y-6 hidden">
                     <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
-                        <h2 class="text-xl font-bold mb-6">App Preferences</h2>
+                        <h2 class="text-xl font-bold mb-6">Preferensi Apps</h2>
                         
                         <div class="space-y-6">
                             <!-- Dark Mode Toggle -->
@@ -142,8 +142,8 @@
                                         <i class="fas fa-moon text-slate-600 dark:text-yellow-400"></i>
                                     </div>
                                     <div>
-                                        <p class="font-bold">Dark Mode</p>
-                                        <p class="text-sm text-slate-500">Switch between light and dark themes</p>
+                                        <p class="font-bold">Mode Gelap (Dark Mode)</p>
+                                        <p class="text-sm text-slate-500">Gonta-ganti tema biar mata gak capek</p>
                                     </div>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer">
@@ -155,7 +155,7 @@
                             <!-- Logout (Redundant but requested) -->
                             <div class="border-t border-slate-100 dark:border-slate-700 pt-6">
                                 <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 py-3 rounded-xl transition-colors font-bold border border-rose-200 dark:border-rose-900/50">
-                                    <i class="fas fa-sign-out-alt"></i> Log Out from this Device
+                                    <i class="fas fa-sign-out-alt"></i> Log Out dari Perangkat Ini
                                 </button>
                             </div>
                         </div>
@@ -165,39 +165,39 @@
                 <!-- Security Tab -->
                 <div id="content-security" class="space-y-6 hidden">
                     <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
-                        <h2 class="text-xl font-bold mb-6">Security Settings</h2>
+                        <h2 class="text-xl font-bold mb-6">Pengaturan Keamanan</h2>
 
                         <div id="google-auth-msg" class="hidden bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 p-4 rounded-xl flex items-start gap-3">
                             <i class="fas fa-info-circle mt-1"></i>
                             <div>
-                                <p class="font-bold">Google Account Connected</p>
-                                <p class="text-sm mt-1">You are logged in via Google. Password management is handled by your Google Account.</p>
+                                <p class="font-bold">Akun Google Konek</p>
+                                <p class="text-sm mt-1">Kamu login pake Google. Jadi password diurus langsung sama Google ya.</p>
                             </div>
                         </div>
 
                         <form id="form-password" class="space-y-4 max-w-md hidden">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Current Password</label>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Password Sekarang</label>
                                 <input type="password" name="current_password" required
                                        class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500 focus:border-emerald-500">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">New Password</label>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Password Baru</label>
                                 <input type="password" name="new_password" required
-                                       class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500 focus:border-emerald-500">
+                                       class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Confirm New Password</label>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Konfirmasi Password Baru</label>
                                 <input type="password" name="new_password_confirmation" required
-                                       class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500 focus:border-emerald-500">
+                                       class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
                             </div>
                             <button type="submit" class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-2.5 rounded-lg font-bold hover:opacity-90 transition-opacity">
-                                Update Password
+                                Ganti Password
                             </button>
                         </form>
 
                         <div class="mt-10 border-t border-slate-200 dark:border-slate-700 pt-6">
-                            <h3 class="font-bold mb-4">Active Sessions</h3>
+                            <h3 class="font-bold mb-4">Sesi Aktif</h3>
                             <div class="text-sm text-slate-500 italic">Session management coming soon.</div>
                         </div>
                     </div>
@@ -253,7 +253,7 @@
         window.handleLogout = async () => {
             showConfirm("Apakah Anda yakin ingin keluar?", async () => {
                 try {
-                    await api.post('/logout');
+                    await api.post('/logout', {}, { useApiPrefix: true });
                 } catch (error) { console.warn("Logout API failed") }
                 
                 localStorage.removeItem('auth_token');
@@ -272,7 +272,7 @@
 
             try {
                 // Fetch User
-                currentUser = await api.get('/me');
+                currentUser = await api.get('/me', { useApiPrefix: true });
                 populateProfile(currentUser);
                 toggleSecurityView(currentUser);
                 
@@ -320,7 +320,7 @@
 
         const loadActivityLogs = async () => {
             try {
-                const logs = await api.get('/settings/activity-logs');
+                const logs = await api.get('/settings/activity-logs', { useApiPrefix: true });
                 const tbody = document.getElementById('activity-log-body');
                 
                 if (!logs || logs.length === 0) {
@@ -363,17 +363,17 @@
         const themeToggleBtn = document.getElementById('toggle-darkmode');
         
         // Init state
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('cokamur-theme') === 'dark' || (!('cokamur-theme' in localStorage) && window.matchMedia('(prefers-cokamur-scheme: dark)').matches)) {
             themeToggleBtn.checked = true;
         }
 
         themeToggleBtn.addEventListener('change', function() {
             if (this.checked) {
                 document.documentElement.classList.add('dark');
-                localStorage.setItem('color-theme', 'dark');
+                localStorage.setItem('cokamur-theme', 'dark');
             } else {
                 document.documentElement.classList.remove('dark');
-                localStorage.setItem('color-theme', 'light');
+                localStorage.setItem('cokamur-theme', 'light');
             }
         });
 
@@ -381,7 +381,7 @@
         window.handleLogout = async () => {
             if(!confirm("Are you sure you want to logout?")) return;
             try {
-                await api.post('/logout');
+                await api.post('/logout', {}, { useApiPrefix: true });
             } catch (error) { console.warn("Logout API failed") }
             
             localStorage.removeItem('auth_token');
@@ -476,7 +476,7 @@
                 const data = Object.fromEntries(formData.entries());
 
                 try {
-                    await api.post('/settings/password', data);
+                    await api.post('/settings/password', data, { useApiPrefix: true });
                     Toast.success("Password changed successfully!");
                     passForm.reset();
                 } catch (error) {
@@ -505,5 +505,8 @@
         });
 
     </script>
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-10 right-4 z-[9999] flex flex-col gap-3 w-full max-w-sm pointer-events-none"></div>
+
 </body>
 </html>

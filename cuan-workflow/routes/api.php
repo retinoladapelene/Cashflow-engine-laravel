@@ -17,10 +17,9 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('/arsenal', [AdArsenalController::class, 'index']); // Public access to ads
 Route::get('/system/settings', [App\Http\Controllers\SettingsController::class, 'systemSettings']);
 
-// Mentor Lab API
-// Moved to web.php for Session Auth compatibility
-Route::get('/mentor/preset', [MentorController::class, 'plannerPreset']); // Keep public? No, move to web.
-// Actually, let's remove them from here and put them in web.php
+// Mentor Lab API V2
+// Moved to web.php for Session Auth
+// use App\Http\Controllers\MentorController;
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {

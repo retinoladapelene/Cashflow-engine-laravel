@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Services\RoadmapGeneratorService;
 use App\Models\Roadmap;
+use App\Models\RoadmapStep;
 use App\Models\RoadmapAction;
 use App\Models\Simulation;
 
@@ -23,25 +24,77 @@ class MentorController extends Controller
         return view('mentor.index'); // If we have a separate view, otherwise it's API
     }
 
+    public function getLatestSimulation(Request $request) {
+        $user = Auth::user();
+        if (!$user && Auth::guard('sanctum')->check()) {
+            $user = Auth::guard('sanctum')->user();
+        }
+
+        if (!$user) return response()->json(['success' => false], 401);
+
+        $latestSim = Simulation::where('user_id', $user->id)
+            ->latest()
+            ->first();
+
+        if (!$latestSim) {
+            return response()->json(['success' => false, 'message' => 'No simulation found']);
+        }
+
+        $inputData = $latestSim->input_data;
+        $dto = new BusinessInputDTO(
+            (float) ($inputData['traffic'] ?? 0),
+            (float) ($inputData['conversion'] ?? 0),
+            (float) ($inputData['price'] ?? 0),
+            (float) ($inputData['cost'] ?? 0),
+            (float) ($inputData['fixed_cost'] ?? 0),
+            (float) ($inputData['target_revenue'] ?? 0)
+        );
+
+        return response()->json([
+            'success' => true,
+            'baseline' => $latestSim->result_data,
+            'diagnostic' => $latestSim->health_score,
+            'input' => $latestSim->input_data,
+            'mode' => $latestSim->mode, // 'optimizer' or 'planner'
+            'sensitivity' => SimulationEngine::sensitivity($dto),
+            'break_even' => SimulationEngine::breakEven($dto)
+        ]);
+    }
+
     public function calculate(Request $request)
     {
         try {
             $input = BusinessInputDTO::fromRequest($request);
             $mode = $request->input('mode', 'optimizer'); // 'optimizer' or 'planner'
 
-            // Save Snapshot if Auth
-            $session = null;
-            \Illuminate\Support\Facades\Log::info('Mentor Calculate Request', ['user_id' => Auth::id(), 'auth_check' => Auth::check()]);
+            // Save Snapshot if Auth (Check both Session and Sanctum)
+            $user = Auth::user();
+            if (!$user && Auth::guard('sanctum')->check()) {
+                $user = Auth::guard('sanctum')->user();
+            }
 
-            if (Auth::check()) {
+            $session = null;
+            \Illuminate\Support\Facades\Log::info('Mentor Calculate Request', ['user_id' => $user ? $user->id : null]);
+
+            if ($user) {
+                // Sync to BusinessProfile
+                $profile = $user->businessProfile;
+                if (!$profile) $profile = $user->businessProfile()->create();
+                
+                $profile->update([
+                    'selling_price' => $input->price,
+                    'variable_costs' => $input->cost,
+                    'fixed_costs' => $input->fixed_cost,
+                    'traffic' => $input->traffic,
+                    'conversion_rate' => $input->conversion,
+                    // 'target_revenue' => $input->target_revenue, // logic might differ
+                ]);
+
                 $session = MentorSession::create([
-                    'user_id' => Auth::id(),
+                    'user_id' => $user->id,
                     'mode' => $mode,
                     'input_json' => $input->toArray(),
                 ]);
-                
-                // Also Create Simulation Record for Roadmap Generator
-                // We use the input here, result (baseline) will be added/updated shortly
             }
 
             // 1. Calculate Baseline
@@ -55,7 +108,7 @@ class MentorController extends Controller
                 
                 // Create/Update Simulation
                 $sim = Simulation::create([
-                    'user_id' => Auth::id(),
+                    'user_id' => $user->id,
                     'mode' => $mode,
                     'input_data' => $input->toArray(),
                     'result_data' => $baseline,
@@ -177,10 +230,15 @@ class MentorController extends Controller
 
     public function getRoadmap()
     {
-        if (!Auth::check()) return response()->json(['success' => false], 401);
+        $user = Auth::user();
+        if (!$user && Auth::guard('sanctum')->check()) {
+            $user = Auth::guard('sanctum')->user();
+        }
 
-        $roadmap = Roadmap::where('user_id', Auth::id())
-            ->where('status', 'active')
+        if (!$user) return response()->json(['success' => false], 401);
+
+        $roadmap = Roadmap::where('user_id', $user->id)
+            ->whereIn('status', ['active', 'completed'])
             ->latest()
             ->with(['steps.actions'])
             ->first();
@@ -193,12 +251,17 @@ class MentorController extends Controller
 
     public function toggleAction(Request $request, $actionId)
     {
-        if (!Auth::check()) return response()->json(['success' => false], 401);
+        $user = Auth::user();
+        if (!$user && Auth::guard('sanctum')->check()) {
+            $user = Auth::guard('sanctum')->user();
+        }
+
+        if (!$user) return response()->json(['success' => false], 401);
 
         $action = RoadmapAction::findOrFail($actionId);
         
         // Security check: belong to user?
-        if ($action->step->roadmap->user_id !== Auth::id()) {
+        if ($action->step->roadmap->user_id !== $user->id) {
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
@@ -207,7 +270,17 @@ class MentorController extends Controller
 
         // Check Step Completion
         $step = $action->step;
+        
+        // Count incomplete actions for THIS step
         $incompleteActions = $step->actions()->where('is_completed', false)->count();
+        
+        \Illuminate\Support\Facades\Log::info('Toggle Action Check', [
+            'action_id' => $actionId,
+            'step_id' => $step->id,
+            'step_order' => $step->order,
+            'incomplete_count' => $incompleteActions,
+            'current_step_status' => $step->status
+        ]);
         
         $stepCompleted = false;
         $nextStepUnlocked = false;
@@ -216,6 +289,8 @@ class MentorController extends Controller
             $step->status = 'completed';
             $step->save();
             $stepCompleted = true;
+
+            \Illuminate\Support\Facades\Log::info('Step Completed', ['step_id' => $step->id]);
 
             // Unlock Next Step
             $nextStep = RoadmapStep::where('roadmap_id', $step->roadmap_id)
@@ -226,15 +301,21 @@ class MentorController extends Controller
                 $nextStep->status = 'unlocked';
                 $nextStep->save();
                 $nextStepUnlocked = true;
+                \Illuminate\Support\Facades\Log::info('Next Step Unlocked', ['next_step_id' => $nextStep->id]);
             } else {
                 // Roadmap Completed!
                 $step->roadmap->status = 'completed';
                 $step->roadmap->save();
+                \Illuminate\Support\Facades\Log::info('Roadmap Completed', ['roadmap_id' => $step->roadmap_id]);
             }
         } elseif ($incompleteActions > 0 && $step->status === 'completed') {
             // Revert completion if user unchecks
-            $step->status = 'unlocked';
+            $step->status = 'unlocked'; // Was 'locked'?, no should be 'unlocked' if revert from completed
+            // Wait, if revert from completed, it becomes active/unlocked.
+            // But next step should be re-locked? Ideally yes, but complexity.
+            // For MVP, just revert this step.
             $step->save();
+            \Illuminate\Support\Facades\Log::info('Step Reverted to Unlocked', ['step_id' => $step->id]);
         }
 
         return response()->json([

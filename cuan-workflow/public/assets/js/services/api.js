@@ -48,7 +48,7 @@ const handleResponse = async (response, options = {}) => {
 };
 
 const fetchWithAuth = async (endpoint, method, body = null, options = {}) => {
-    const useApiPrefix = options.useApiPrefix !== false; // Default true
+    const useApiPrefix = options.useApiPrefix === true; // Default false (Web Guard)
     const url = useApiPrefix ? `${API_URL}${endpoint}` : endpoint;
 
     const config = {

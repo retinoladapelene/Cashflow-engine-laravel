@@ -78,4 +78,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(RoadmapProgress::class);
     }
+
+    public function reverseGoalSessions()
+    {
+        return $this->hasMany(ReverseGoalSession::class);
+    }
+
+    public function profitSimulations()
+    {
+        return $this->hasMany(ProfitSimulation::class);
+    }
 }

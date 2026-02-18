@@ -15,7 +15,7 @@ window.toggleSystemFeature = async (feature, isActive) => {
         await api.post('/admin/settings', {
             key: `feature_${feature}`,
             value: isActive ? '1' : '0'
-        });
+        }, { useApiPrefix: true });
         showToast(`Feature ${feature} ${isActive ? 'enabled' : 'disabled'}`, "success");
     } catch (error) {
         showToast("Failed to update feature flag", "error");
@@ -25,7 +25,7 @@ window.toggleSystemFeature = async (feature, isActive) => {
 
 window.initSystemControl = async () => {
     try {
-        const settings = await api.get('/admin/settings');
+        const settings = await api.get('/admin/settings', { useApiPrefix: true });
 
         // Sync checkboxes
         if (settings.feature_calculator !== undefined) {
@@ -78,7 +78,7 @@ window.toggleMaintenance = async () => {
             await api.post('/admin/settings', {
                 key: 'system_maintenance',
                 value: isEnabling ? '1' : '0'
-            });
+            }, { useApiPrefix: true });
             window.initSystemControl(); // Refresh UI
             showToast(`Maintenance Mode ${isEnabling ? 'Enabled' : 'Disabled'}`, "success");
         } catch (error) {
@@ -93,7 +93,7 @@ window.toggleMaintenance = async () => {
 window.banUser = async (userId) => {
     if (!confirm("Are you sure you want to ban this user?")) return;
     try {
-        await api.post(`/admin/users/${userId}/ban`);
+        await api.post(`/admin/users/${userId}/ban`, {}, { useApiPrefix: true });
         showToast("User banned successfully", "success");
         loadUsers();
     } catch (error) {
@@ -104,7 +104,7 @@ window.banUser = async (userId) => {
 window.unbanUser = async (userId) => {
     if (!confirm("Unban this user?")) return;
     try {
-        await api.post(`/admin/users/${userId}/unban`);
+        await api.post(`/admin/users/${userId}/unban`, {}, { useApiPrefix: true });
         showToast("User unbanned successfully", "success");
         loadUsers();
     } catch (error) {
@@ -115,7 +115,7 @@ window.unbanUser = async (userId) => {
 window.promoteUser = async (userId) => {
     if (!confirm("Promote this user to Admin?")) return;
     try {
-        await api.post(`/admin/users/${userId}/promote`);
+        await api.post(`/admin/users/${userId}/promote`, {}, { useApiPrefix: true });
         showToast("User promoted to Admin", "success");
         loadUsers();
     } catch (error) {
@@ -133,7 +133,7 @@ window.changeUserPassword = async (userId) => {
     }
 
     try {
-        await api.post(`/admin/users/${userId}/password`, { password: newPassword });
+        await api.post(`/admin/users/${userId}/password`, { password: newPassword }, { useApiPrefix: true });
         showToast("Password updated successfully", "success");
     } catch (error) {
         showToast("Failed to update password", "error");
@@ -165,12 +165,12 @@ window.updateBroadcastSystem = async () => {
         await api.post('/admin/settings', {
             key: 'system_announcement',
             value: message
-        });
+        }, { useApiPrefix: true });
 
         await api.post('/admin/settings', {
             key: 'system_broadcast_active',
             value: isActive
-        });
+        }, { useApiPrefix: true });
 
         showToast("Broadcast settings updated successfully", "success");
     } catch (error) {
@@ -204,7 +204,7 @@ export const initAdminDashboard = async () => {
 
 const loadStats = async () => {
     try {
-        const stats = await api.get('/admin/stats');
+        const stats = await api.get('/admin/stats', { useApiPrefix: true });
 
         // Update UI (IDs corrected to match admin.blade.php)
         if (document.getElementById('stat-total-users')) document.getElementById('stat-total-users').innerText = stats.total_users || 0;
@@ -226,7 +226,7 @@ const loadActivityLogs = async () => {
     if (!container) return;
 
     try {
-        const logs = await api.get('/admin/logs');
+        const logs = await api.get('/admin/logs', { useApiPrefix: true });
 
         if (!logs || logs.length === 0) {
             container.innerHTML = '<div class="text-sm text-slate-500 italic">No activity recorded yet.</div>';
@@ -275,7 +275,7 @@ const loadActivityLogs = async () => {
 
 const loadCharts = async () => {
     try {
-        const response = await api.get('/admin/charts');
+        const response = await api.get('/admin/charts', { useApiPrefix: true });
         // Handle direct response or wrapped in data
         const data = response.user_growth ? response : response.data;
 
@@ -504,7 +504,7 @@ const loadUsers = async () => {
     tableBody.innerHTML = '<tr><td colspan="5" class="text-center p-4">Loading...</td></tr>';
 
     try {
-        const response = await api.get('/admin/users'); // Pagination default page 1
+        const response = await api.get('/admin/users', { useApiPrefix: true }); // Pagination default page 1
         const users = response.data; // Laravel pagination wrapped in 'data'
 
         if (!users || users.length === 0) {
@@ -580,7 +580,7 @@ window.viewUser = async (userId) => {
     `;
 
     try {
-        const response = await api.get(`/admin/users/${userId}`);
+        const response = await api.get(`/admin/users/${userId}`, { useApiPrefix: true });
         const { user, logs } = response; // Removed .data
         const business = user.business_profile || {};
 

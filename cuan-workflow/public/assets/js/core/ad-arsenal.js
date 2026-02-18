@@ -16,7 +16,7 @@ async function initAdArsenal() {
     if (!tableBody) return;
 
     try {
-        const ads = await api.get('/arsenal'); // Public endpoint returns active, but admin might need all?
+        const ads = await api.get('/arsenal', { useApiPrefix: true }); // Public endpoint returns active, but admin might need all?
         // Wait, the public endpoint `/arsenal` filters IsActive=true. 
         // Admin needs to see all. I didn't create an explicit admin endpoint for "all" in api.php 
         // OTHER THAN `api.get('/arsenal')` which uses `AdArsenalController@index`.
@@ -140,10 +140,10 @@ window.saveArsenalCard = async () => {
         const payload = { title, description, tag, link, sort_order, is_active };
 
         if (editingArsenalId) {
-            await api.put(`/admin/arsenal/${editingArsenalId}`, payload);
+            await api.put(`/admin/arsenal/${editingArsenalId}`, payload, { useApiPrefix: true });
             showToast('Card updated successfully', 'success');
         } else {
-            await api.post('/admin/arsenal', payload);
+            await api.post('/admin/arsenal', payload, { useApiPrefix: true });
             showToast('Card created successfully', 'success');
         }
 
@@ -167,7 +167,7 @@ window.editArsenalCard = (id, title, description, tag, link, sort_order, is_acti
 window.deleteArsenalCard = (id) => {
     if (!confirm("Delete this card?")) return;
 
-    api.delete(`/admin/arsenal/${id}`)
+    api.delete(`/admin/arsenal/${id}`, { useApiPrefix: true })
         .then(() => {
             showToast('Card deleted successfully', 'success');
             initAdArsenal();

@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
 
     try {
-        const ads = await api.get('/arsenal');
+        const ads = await api.get('/arsenal', { useApiPrefix: true });
 
         if (!ads || ads.length === 0) {
             container.innerHTML = `
