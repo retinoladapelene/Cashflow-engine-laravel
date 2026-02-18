@@ -14,20 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function checkSystemSettings() {
     try {
-        // Optional: Fetch from API if endpoint exists
-        // const settings = await api.get('/system/settings');
+        // Fetch from API
+        const settings = await api.get('/public/system/settings').catch(() => null) || await api.get('/system/settings');
 
-        // Defaults for now
-        const settings = {
-            flags: {
-                calculator: true,
-                export_pdf: true
-            },
-            broadcast: {
-                isActive: false,
-                message: ""
-            }
-        };
+        if (!settings) throw new Error("No settings data");
 
         applySettings(settings);
 

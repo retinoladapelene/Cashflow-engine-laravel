@@ -24,6 +24,11 @@ class AuthController extends Controller
             'whatsapp' => 'required',
         ]);
 
+        $regFlag = \App\Models\SystemSetting::where('key', 'feature_registration')->first();
+        if ($regFlag && $regFlag->value === '0') {
+            return response()->json(['message' => 'Pendaftaran pengguna baru sedang ditutup sementara.'], 403);
+        }
+
         $agent = $this->parseUserAgent($request->header('User-Agent'));
         Log::info('Register User-Agent: ' . $request->header('User-Agent'));
         Log::info('Parsed Agent: ', $agent);
@@ -218,6 +223,12 @@ class AuthController extends Controller
 
                 $user->update($updateData);
             } else {
+                // Check if registration is allowed
+                $regFlag = \App\Models\SystemSetting::where('key', 'feature_registration')->first();
+                if ($regFlag && $regFlag->value === '0') {
+                    return redirect('/login?error=' . urlencode('Pendaftaran pengguna baru sedang ditutup sementara.'));
+                }
+
                 // Create new user
                 $name = $googleUser->name;
                 

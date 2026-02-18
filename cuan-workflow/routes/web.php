@@ -5,7 +5,8 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
-    return view('index');
+    $settings = \App\Models\SystemSetting::all()->pluck('value', 'key');
+    return view('index', ['settings' => $settings]);
 })->name('index');
 
 Route::get('/login', function () {

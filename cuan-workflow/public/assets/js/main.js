@@ -1,5 +1,6 @@
 import { initAuthListener, logoutUser } from './core/auth-engine.js';
 import { mainController } from './core/main-controller.js';
+import { businessCore } from './core/BusinessCore.js'; // Import Core
 import { calculateGoal, updateCalculator } from './calculator.js';
 import { initTheme } from './theme.js';
 import { startTour } from './tour.js';
@@ -52,7 +53,7 @@ function initGreeting() {
 }
 
 
-window.onload = function () {
+window.onload = async function () { // Make it async
     console.log('UI V.7 Initialized - Debugging Mode On');
 
     const splash = select('#splash-screen');
@@ -70,7 +71,11 @@ window.onload = function () {
         initScrollEffects();
         initBackToTop();
         initAuthListener();
+
         mainController.init();
+
+        // Initialize Core (Loads data from API)
+        await businessCore.init();
 
         // Initialize dynamic greeting
         initGreeting();
@@ -99,7 +104,7 @@ window.onload = function () {
         if (btnCalcGoal) listen(btnCalcGoal, 'click', calculateGoal);
 
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js')
+            navigator.serviceWorker.register('./sw.js?v=15')
                 .then(() => console.log('SW Registered'))
                 .catch(e => console.log('SW Fail:', e));
         }

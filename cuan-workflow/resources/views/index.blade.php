@@ -351,6 +351,7 @@
             </div>
         </section>
 
+        @if(($settings['feature_calculator'] ?? '1') == '1')
         <section id="goal-planner"
             class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-3">
             <div class="p-8 lg:p-10 bg-slate-900 dark:bg-slate-950 text-white space-y-6">
@@ -421,7 +422,6 @@
 
                     <div class="p-4 bg-emerald-600 text-white rounded-2xl shadow-md border-t-4 border-emerald-400">
                         <p class="text-emerald-100 text-[10px] font-black uppercase tracking-wider">Focus on This ONE
-                            Thing</p>
                         <p id="goal-priority" class="text-sm font-bold mt-2 leading-relaxed">
                             Manfaatkan Strategi Affiliate untuk mendapatkan traffic tersebut dengan cepat!
                         </p>
@@ -625,6 +625,7 @@
                 </div>
             </div>
         </section>
+        @endif
 
 
 
@@ -645,7 +646,7 @@
             </div>
 
             <div id="ad-arsenal-container"
-                class="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto p-4 md:p-0 snap-x snap-mandatory no-scrollbar">
+                class="flex md:flex-wrap justify-center gap-6 overflow-x-auto p-4 md:p-0 snap-x snap-mandatory no-scrollbar">
                 <!-- Data loaded via ad-arsenal-frontend.js -->
             </div>
         </section>

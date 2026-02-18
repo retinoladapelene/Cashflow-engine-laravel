@@ -15,6 +15,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('/arsenal', [AdArsenalController::class, 'index']); // Public access to ads
+Route::get('/system/settings', [App\Http\Controllers\SettingsController::class, 'systemSettings']);
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -40,6 +41,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(EnsureUserIsAdmin::class)->prefix('admin')->group(function () {
         Route::get('/users', [AdminController::class, 'users']);
         Route::get('/stats', [AdminController::class, 'stats']);
+        Route::get('/logs', [AdminController::class, 'logs']);
+        Route::get('/settings', [AdminController::class, 'getSettings']);
+        Route::post('/settings', [AdminController::class, 'updateSetting']);
+        Route::get('/users/{id}', [AdminController::class, 'show']); // Inspector
         Route::get('/charts', [AdminController::class, 'charts']);
         Route::post('/users/{user}/ban', [AdminController::class, 'ban']);
         Route::post('/users/{user}/unban', [AdminController::class, 'unban']);

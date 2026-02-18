@@ -92,4 +92,20 @@ class SettingsController extends Controller
 
         return response()->json(['message' => 'Password changed successfully!']);
     }
+    public function systemSettings()
+    {
+        $settings = \App\Models\SystemSetting::pluck('value', 'key');
+
+        return response()->json([
+            'flags' => [
+                'calculator' => ($settings['feature_calculator'] ?? '1') === '1',
+                'export_pdf' => ($settings['feature_export_pdf'] ?? '1') === '1',
+                'registration' => ($settings['feature_registration'] ?? '1') === '1',
+            ],
+            'broadcast' => [
+                'isActive' => ($settings['system_broadcast_active'] ?? '0') === '1',
+                'message' => $settings['system_announcement'] ?? '',
+            ]
+        ]);
+    }
 }

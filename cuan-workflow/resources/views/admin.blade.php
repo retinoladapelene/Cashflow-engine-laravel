@@ -230,6 +230,45 @@
                     </div>
                 </div>
 
+                <!-- Business Intelligence (V.14) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Total Projected Revenue -->
+                    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                        <div
+                            class="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition">
+                        </div>
+                        <div class="text-slate-400 text-sm mb-1">Projected Revenue</div>
+                        <div class="text-2xl font-bold text-white mb-2" id="stat-projected-revenue">Loading...</div>
+                        <div class="text-xs text-amber-400 flex items-center gap-1">
+                            <i class="fas fa-coins"></i> Total User Targets
+                        </div>
+                    </div>
+
+                    <!-- Total Ad Spend -->
+                    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                        <div
+                            class="absolute -right-4 -top-4 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/20 transition">
+                        </div>
+                        <div class="text-slate-400 text-sm mb-1">Total Ad Spend</div>
+                        <div class="text-2xl font-bold text-white mb-2" id="stat-ad-spend">Loading...</div>
+                        <div class="text-xs text-rose-400 flex items-center gap-1">
+                            <i class="fas fa-bullhorn"></i> Market Injection
+                        </div>
+                    </div>
+
+                    <!-- Active Businesses -->
+                    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                        <div
+                            class="absolute -right-4 -top-4 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition">
+                        </div>
+                        <div class="text-slate-400 text-sm mb-1">Active Businesses</div>
+                        <div class="text-2xl font-bold text-white mb-2" id="stat-active-businesses">Loading...</div>
+                        <div class="text-xs text-cyan-400 flex items-center gap-1">
+                            <i class="fas fa-briefcase"></i> Users with Plans
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Recent Activity Log -->
                 <div class="glass-panel rounded-2xl p-6">
                     <h3 class="text-lg font-medium text-white mb-4">Latest System Activity</h3>
@@ -261,6 +300,63 @@
                         <div class="relative h-64">
                             <canvas id="userRetentionChart"></canvas>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Business Analytics Section (V.14) -->
+                <div class="glass-panel rounded-2xl p-6 mt-6 border border-emerald-500/20">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-2 bg-emerald-900/30 rounded-lg text-emerald-400">
+                            <i class="fas fa-search-dollar text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Market Intelligence</h3>
+                            <p class="text-xs text-slate-400">Deep dive into user business data for ad targeting & feature planning.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Chart 1: Revenue vs Ad Spend (Scatter) -->
+                        <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-sm font-bold text-white">Revenue Aspiration Map</h4>
+                                <span class="text-[10px] text-slate-500 bg-slate-900 px-2 py-1 rounded">Target vs Spend</span>
+                            </div>
+                            <div class="relative h-64">
+                                <canvas id="revenueScatterChart"></canvas>
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-2 italic">
+                                <span class="text-emerald-400 font-bold">Insight:</span> Users in top-right are your "Whales" (High Spend, High Target).
+                            </p>
+                        </div>
+
+                        <!-- Chart 2: Pricing Power (Bar) -->
+                        <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-sm font-bold text-white">Pricing Power Distribution</h4>
+                                <span class="text-[10px] text-slate-500 bg-slate-900 px-2 py-1 rounded">Product Price</span>
+                            </div>
+                            <div class="relative h-64">
+                                <canvas id="priceDistChart"></canvas>
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-2 italic">
+                                <span class="text-blue-400 font-bold">Insight:</span> Customise ads based on whether users sell budget or luxury items.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Chart 3: Conversion Reality (Horizontal Bar) -->
+                    <div class="mt-6 bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                         <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-sm font-bold text-white">Conversion Rate Reality Class</h4>
+                                <div class="text-right">
+                                    <div class="textxs text-slate-400">Avg Conv. Rate</div>
+                                    <div class="text-lg font-bold text-emerald-400" id="avg-conv-rate">0%</div>
+                                </div>
+                            </div>
+                            <div class="relative h-48">
+                                <canvas id="convRateChart"></canvas>
+                            </div>
                     </div>
                 </div>
 
@@ -379,9 +475,59 @@
                             </label>
                         </div>
 
+                        <!-- Flag Item: User Registration -->
+                        <div
+                            class="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div>
+                                <div class="text-sm font-bold text-white">Public Registration</div>
+                                <div class="text-xs text-slate-500">Enable new user signups</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" id="flag-registration"
+                                    onchange="toggleSystemFeature('registration', this.checked)">
+                                <div
+                                    class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500">
+                                </div>
+                            </label>
+                        </div>
 
                     </div>
+
                 </div>
+
+                 <!-- 2. System Maintenance -->
+                 <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4"><i class="fas fa-tools text-amber-400 mr-2"></i>
+                        System Maintenance</h3>
+                    
+                    <div class="bg-amber-900/20 border border-amber-500/30 p-4 rounded-xl mb-6">
+                        <div class="flex gap-4">
+                            <i class="fas fa-exclamation-triangle text-amber-500 text-xl mt-1"></i>
+                            <div>
+                                <h4 class="text-sm font-bold text-amber-200">Warning: Maintenance Mode</h4>
+                                <p class="text-xs text-amber-200/70 mt-1">Enabling maintenance mode will block all non-admin users from accessing the app with a "Site Under Maintenance" screen.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-6 bg-slate-800/50 rounded-2xl border border-slate-700">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center text-slate-400" id="maintenance-icon">
+                                <i class="fas fa-power-off"></i>
+                            </div>
+                            <div>
+                                <div class="text-lg font-bold text-white" id="maintenance-status-text">App is Online</div>
+                                <div class="text-sm text-slate-500">Switch to maintenance mode to perform updates.</div>
+                            </div>
+                        </div>
+                         <button id="btn-toggle-maintenance" onclick="toggleMaintenance()" 
+                            class="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition-all">
+                            ENABLE
+                         </button>
+                    </div>
+                </div>
+
+
 
                 <!-- 2. Broadcast Center -->
                 <div class="glass-panel rounded-2xl p-6">
@@ -402,8 +548,8 @@
                                 <label class="block text-xs text-slate-500 mb-1">Status</label>
                                 <select id="broadcast-active"
                                     class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-3 text-white focus:outline-none focus:border-amber-500 transition">
-                                    <option value="false">Inactive</option>
-                                    <option value="true">Active</option>
+                                    <option value="0">Inactive</option>
+                                    <option value="1">Active</option>
                                 </select>
                             </div>
                         </div>
@@ -594,6 +740,13 @@
             }
         }
 
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
         function switchTab(tabId) {
             // Close sidebar on mobile when navigating
             const sidebar = document.getElementById('sidebar-panel');
@@ -637,6 +790,7 @@
                 'arsenal': 'Ad Arsenal Manager'
             };
             document.getElementById('page-title').innerText = titles[tabId] || 'Dashboard';
+
 
             // 5. Lazy Load Modules
             if (tabId === 'users' && !window.hasLoadedUserMgmt) {
@@ -694,6 +848,24 @@
             <div class="flex-1 overflow-y-auto p-4 space-y-3" id="history-list">
                 <!-- History Items Injected Here -->
                 <div class="text-center text-slate-500 mt-10">Loading history...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. User Inspector Modal (V.15) -->
+    <div id="modal-user-inspector"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl h-[90vh] flex flex-col shadow-2xl relative">
+             <button onclick="closeModal('modal-user-inspector')" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-2 rounded-full z-10 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="flex-1 overflow-y-auto p-0" id="inspector-content">
+                <!-- Content injected via JS -->
+                <div class="flex flex-col items-center justify-center h-full text-slate-500">
+                    <i class="fas fa-circle-notch fa-spin text-3xl mb-4 text-emerald-500"></i>
+                    <p>Loading user profile...</p>
+                </div>
             </div>
         </div>
     </div>

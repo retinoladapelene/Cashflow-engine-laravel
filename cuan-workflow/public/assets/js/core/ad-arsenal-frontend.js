@@ -12,9 +12,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Render Skeleton
     container.innerHTML = `
-        <div class="animate-pulse bg-slate-200 dark:bg-slate-800 rounded-3xl h-64 w-full"></div>
-        <div class="animate-pulse bg-slate-200 dark:bg-slate-800 rounded-3xl h-64 w-full hidden md:block"></div>
-        <div class="animate-pulse bg-slate-200 dark:bg-slate-800 rounded-3xl h-64 w-full hidden md:block"></div>
+        <div class="animate-pulse bg-slate-200 dark:bg-slate-800 rounded-3xl h-64 min-w-[85vw] md:min-w-[24rem] w-full max-w-sm"></div>
+        <div class="animate-pulse bg-slate-200 dark:bg-slate-800 rounded-3xl h-64 w-full md:min-w-[24rem] max-w-sm hidden md:block"></div>
+        <div class="animate-pulse bg-slate-200 dark:bg-slate-800 rounded-3xl h-64 w-full md:min-w-[24rem] max-w-sm hidden md:block"></div>
     `;
 
     try {
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!ads || ads.length === 0) {
             container.innerHTML = `
-                <div class="col-span-3 text-center py-10">
+                <div class="w-full text-center py-10">
                     <p class="text-slate-500">Belum ada tools tambahan saat ini.</p>
                 </div>
             `;
@@ -31,13 +31,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         container.innerHTML = '';
 
-        // API response is already sorted by sort_order if backend handles it
-        // If not, sort here: ads.sort((a,b) => a.sort_order - b.sort_order);
+        // API response is already sorted by sort_order
 
         ads.forEach((data) => {
             const card = document.createElement('div');
-            // Responsive classes mirroring the original design
-            card.className = "min-w-[85vw] md:min-w-0 snap-center bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full";
+            // Responsive classes: Flex based centering
+            card.className = "min-w-[85vw] md:min-w-[22rem] md:max-w-md w-full md:w-96 snap-center bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full";
 
             // Icon styling based on tag logic or default
             let iconClass = "fa-rocket";

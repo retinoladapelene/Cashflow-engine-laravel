@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cuancapital-v13-laravel';
+const CACHE_NAME = 'cuancapital-v14-laravel';
 const ASSETS_TO_CACHE = [
     '/',
     '/login',
@@ -44,23 +44,58 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event: Network First Strategy
 self.addEventListener('fetch', (event) => {
-    // Skip Firestore and API requests
-    if (event.request.url.includes('firestore') || event.request.url.includes('googleapis')) {
+    // Skip Firestore, API requests, and browser extensions
+    if (event.request.url.includes('firestore') ||
+        event.request.url.includes('googleapis') ||
+        event.request.url.startsWith('chrome-extension')) {
         return;
     }
 
     event.respondWith(
         fetch(event.request)
             .then((response) => {
-                // Clone valid responses to cache (Runtime Caching)
+                // Check if we received a valid response
                 if (!response || response.status !== 200 || response.type !== 'basic') {
                     return response;
                 }
+
+                // Only cache GET requests
+                if (event.request.method === 'GET') {
+                    // Clone the response because it's a stream and can only be consumed once
+                    const responseToCache = response.clone();
+
+                    caches.open(CACHE_NAME)
+                        .then((cache) => {
+                            cache.put(event.request, responseToCache);
+                        });
+                }
+
                 return response;
             })
             .catch(() => {
                 // Fallback to cache if network fails (Offline Mode)
-                return caches.match(event.request);
+                return caches.match(event.request).then((response) => {
+                    if (response) {
+                        return response;
+                    }
+
+                    // If request is for an API, return JSON error
+                    if (event.request.url.includes('/api/')) {
+                        return new Response(JSON.stringify({ error: 'System under maintenance or offline' }), {
+                            status: 503,
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                    }
+
+                    // If not in cache and not API, return a fallback response
+                    return new Response('Network error and not in cache', {
+                        status: 503,
+                        statusText: 'Service Unavailable',
+                        headers: new Headers({
+                            'Content-Type': 'text/plain'
+                        })
+                    });
+                });
             })
     );
 });

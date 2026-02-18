@@ -18,7 +18,54 @@ class AdminController extends Controller
             'total_users' => User::count(),
             'new_users_today' => User::whereDate('created_at', today())->count(),
             'active_users_today' => User::whereDate('last_login_at', today())->count(),
+            'total_revenue' => \App\Models\BusinessProfile::sum('target_revenue'),
+            'total_ad_spend' => \App\Models\BusinessProfile::sum('ad_spend'),
+            'active_businesses' => \App\Models\BusinessProfile::where('target_revenue', '>', 0)->count(),
         ]);
+    }
+
+    public function logs()
+    {
+        return \App\Models\ActivityLog::with('user:id,name,email,avatar')
+            ->latest()
+            ->limit(50)
+            ->get();
+    }
+
+    public function show($id)
+    {
+        $user = User::with('businessProfile')->findOrFail($id);
+        
+        // Get last 20 activities for this specific user
+        $logs = \App\Models\ActivityLog::where('user_id', $id)
+            ->latest()
+            ->limit(20)
+            ->get();
+
+        return response()->json([
+            'user' => $user,
+            'logs' => $logs
+        ]);
+    }
+
+    public function getSettings()
+    {
+        return \App\Models\SystemSetting::all()->pluck('value', 'key');
+    }
+
+    public function updateSetting(Request $request)
+    {
+        $request->validate([
+            'key' => 'required|string',
+            'value' => 'nullable'
+        ]);
+
+        $setting = \App\Models\SystemSetting::updateOrCreate(
+            ['key' => $request->key],
+            ['value' => $request->value]
+        );
+
+        return response()->json($setting);
     }
 
     public function ban(User $user)
@@ -68,6 +115,36 @@ class AdminController extends Controller
             'Admin' => User::where('role', 'admin')->count(),
         ];
 
+        // 5. Business Analytics (Scatter: Ad Spend vs Revenue)
+        $scatterData = \App\Models\BusinessProfile::select('ad_spend', 'target_revenue', 'business_name')
+            ->where('target_revenue', '>', 0)
+            ->where('ad_spend', '>', 0)
+            ->get()
+            ->map(function ($p) {
+                return ['x' => (float)$p->ad_spend, 'y' => (float)$p->target_revenue, 'name' => $p->business_name];
+            });
+
+        // 6. Pricing Power Distribution
+        $prices = \App\Models\BusinessProfile::where('selling_price', '>', 0)->pluck('selling_price');
+        $priceBuckets = [
+            '< 100k' => $prices->filter(fn($p) => $p < 100000)->count(),
+            '100k - 500k' => $prices->filter(fn($p) => $p >= 100000 && $p < 500000)->count(),
+            '500k - 1M' => $prices->filter(fn($p) => $p >= 500000 && $p < 1000000)->count(),
+            '> 1M' => $prices->filter(fn($p) => $p >= 1000000)->count(),
+        ];
+
+        // 7. Conversion Rate Analysis
+        $conversions = \App\Models\BusinessProfile::where('conversion_rate', '>', 0)->pluck('conversion_rate');
+        $convStats = [
+            'avg' => $conversions->avg() ?? 0,
+            'max' => $conversions->max() ?? 0,
+            'buckets' => [
+                'Low (<1%)' => $conversions->filter(fn($c) => $c < 1)->count(),
+                'Healthy (1-3%)' => $conversions->filter(fn($c) => $c >= 1 && $c <= 3)->count(),
+                'High (>3%)' => $conversions->filter(fn($c) => $c > 3)->count(),
+            ]
+        ];
+
         return response()->json([
             'user_growth' => $growth,
             'user_segments' => $segments,
@@ -79,6 +156,11 @@ class AdminController extends Controller
                 ->whereNotNull('browser')
                 ->groupBy('browser')
                 ->pluck('count', 'browser'),
+            'business_analytics' => [
+                'scatter' => $scatterData,
+                'prices' => $priceBuckets,
+                'conversion' => $convStats
+            ]
         ]);
     }
 }
