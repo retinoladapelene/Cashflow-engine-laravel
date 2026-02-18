@@ -29,7 +29,8 @@ const INPUT_MAP = {
     'empire-fixed-costs': 'fixedCosts',
     'empire-target-sales': 'targetRevenue', // Linked to target revenue logic
     'empire-available-cash': 'availableCash',
-    'empire-capacity-input': 'maxCapacity' // NEW: Capacity Input
+    'empire-capacity-input': 'maxCapacity', // NEW: Capacity Input
+    'currency-selector': 'currency' // Global Currency Selector
 };
 
 class MainController {

@@ -53,6 +53,70 @@ export const showToast = (message, type = 'info') => {
 };
 
 /**
+ * Shows a custom confirmation modal
+ * @param {string} message - The message to display
+ * @param {Function} onConfirm - Callback function when user confirms
+ * @param {Function} onCancel - Callback function when user cancels (optional)
+ */
+export const showConfirm = (message, onConfirm, onCancel = null) => {
+    // Create modal container
+    const modalId = 'custom-confirm-modal';
+    const existingModal = document.getElementById(modalId);
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm opacity-0 transition-opacity duration-300';
+
+    modal.innerHTML = `
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700">
+            <div class="flex flex-col items-center text-center">
+                <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center mb-4 text-rose-500 dark:text-rose-400">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Konfirmasi</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">${message}</p>
+                <div class="flex gap-3 w-full">
+                    <button id="btn-cancel-confirm" class="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-xl font-bold transition-colors">
+                        Batal
+                    </button>
+                    <button id="btn-yes-confirm" class="flex-1 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition-colors shadow-lg shadow-rose-500/20">
+                        Ya, Lanjutkan
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Animate In
+    requestAnimationFrame(() => {
+        modal.classList.remove('opacity-0');
+        modal.querySelector('div').classList.remove('scale-95');
+        modal.querySelector('div').classList.add('scale-100');
+    });
+
+    // Handlers
+    const close = () => {
+        modal.classList.add('opacity-0');
+        modal.querySelector('div').classList.remove('scale-100');
+        modal.querySelector('div').classList.add('scale-95');
+        setTimeout(() => modal.remove(), 300);
+    };
+
+    document.getElementById('btn-cancel-confirm').onclick = () => {
+        close();
+        if (onCancel) onCancel();
+    };
+
+    document.getElementById('btn-yes-confirm').onclick = () => {
+        close();
+        if (onConfirm) onConfirm();
+    };
+};
+
+/**
  * Format Angka ke Format Mata Uang IDR (Default)
  * @param {number} number 
  * @param {string} currencyCode 

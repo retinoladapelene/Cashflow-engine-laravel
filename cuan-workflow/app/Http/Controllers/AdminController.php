@@ -163,4 +163,16 @@ class AdminController extends Controller
             ]
         ]);
     }
+    public function updateUserPassword(Request $request, User $user)
+    {
+        $request->validate([
+            'password' => 'required|min:6',
+        ]);
+
+        $user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password)
+        ]);
+
+        return response()->json(['message' => 'Password updated successfully']);
+    }
 }

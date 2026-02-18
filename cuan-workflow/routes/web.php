@@ -28,4 +28,17 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']); // Fixed namespace
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/mentor/roadmap/generate', [App\Http\Controllers\MentorController::class, 'generateRoadmap']);
+    Route::get('/mentor/roadmap', [App\Http\Controllers\MentorController::class, 'getRoadmap']);
+    Route::post('/mentor/roadmap/action/{id}/toggle', [App\Http\Controllers\MentorController::class, 'toggleAction']);
+});
+
+// Mentor Lab Public/Session Routes (Allow Guest but start Session)
+Route::get('/mentor/preset', [App\Http\Controllers\MentorController::class, 'plannerPreset']);
+Route::post('/mentor/calculate', [App\Http\Controllers\MentorController::class, 'calculate']);
+Route::post('/mentor/simulate', [App\Http\Controllers\MentorController::class, 'simulate']);
+Route::post('/mentor/upsell', [App\Http\Controllers\MentorController::class, 'upsell']);
+Route::get('/mentor/feasibility', [App\Http\Controllers\MentorController::class, 'checkFeasibility']);

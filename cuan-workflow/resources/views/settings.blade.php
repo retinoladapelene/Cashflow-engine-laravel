@@ -243,9 +243,24 @@
     <script type="module">
         import { Toast } from '/assets/js/components/toast-notification.js';
         import { api } from '/assets/js/services/api.js';
-        import { formatDate } from '/assets/js/utils/helpers.js';
+        import { formatDate, showConfirm } from '/assets/js/utils/helpers.js';
 
         let currentUser = null;
+
+        // ... existing code ...
+
+        // --- Logout Logic ---
+        window.handleLogout = async () => {
+            showConfirm("Apakah Anda yakin ingin keluar?", async () => {
+                try {
+                    await api.post('/logout');
+                } catch (error) { console.warn("Logout API failed") }
+                
+                localStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            });
+        };
+        document.getElementById('btn-logout-nav').addEventListener('click', window.handleLogout);
 
         // --- Init Data Fetch ---
         const initSettings = async () => {

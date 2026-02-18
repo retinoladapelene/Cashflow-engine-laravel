@@ -1,3 +1,5 @@
+import { showToast } from '../utils/helpers.js';
+
 export function initAdminDashboard() {
     console.log("Initializing Admin Dashboard...");
 
@@ -12,7 +14,7 @@ export function initAdminDashboard() {
             const btn = document.createElement('button');
             btn.className = "admin-edit-btn absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded shadow";
             btn.innerText = "Edit";
-            btn.onclick = () => alert(`Edit Strategy: ${title}`);
+            btn.onclick = () => showToast(`Edit Strategy: ${title}`, 'info');
             card.style.position = 'relative';
             card.appendChild(btn);
         }

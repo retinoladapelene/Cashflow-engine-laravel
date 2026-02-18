@@ -13,6 +13,7 @@
     </script>
 
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CuanCapital - Cashflow Engine - Business Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -140,7 +141,7 @@
                         <i class="fas fa-circle-question text-xl"></i>
                     </button>
                     <select id="currency-selector"
-                        class="hidden md:block bg-slate-100 dark:bg-slate-800 border-none text-slate-900 dark:text-white text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 p-2 cursor-pointer font-bold">
+                        class="bg-slate-100 dark:bg-slate-800 border-none text-slate-900 dark:text-white text-xs md:text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 p-2 cursor-pointer font-bold">
                         <option value="IDR">IDR (Rp)</option>
                         <option value="USD">USD ($)</option>
                         <option value="EUR">EUR (€)</option>
@@ -651,6 +652,385 @@
             </div>
         </section>
 
+    <!-- BUSINESS SIMULATION LAB SECTION -->
+    <section id="business-simulation-lab" class="py-20 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold tracking-widest uppercase text-sm">Validasi Ide Bisnis</span>
+                <h2 class="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">
+                    Business Simulation Lab <span class="bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-xs px-2 py-1 rounded-full align-top ml-2">Beta</span>
+                </h2>
+                <p class="mt-4 text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
+                    Uji potensi bisnis Anda sebelum bakar uang. Optimasi strategi yang sudah jalan atau rencanakan bisnis baru dengan data.
+                </p>
+            </div>
+
+            <!-- Mode Selection -->
+            <div class="flex justify-center mb-10">
+                <div class="bg-white dark:bg-slate-800 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 inline-flex">
+                    <button id="mode-optimizer-btn" class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 bg-emerald-600 text-white shadow-lg shadow-emerald-500/30">
+                        <i class="fas fa-rocket mr-2"></i> OPTIMIZER (Bisnis Jalan)
+                    </button>
+                    <button id="mode-planner-btn" class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                        <i class="fas fa-compass mr-2"></i> PLANNER (Bisnis Baru)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Lab Container -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Input Panel -->
+                <div class="lg:col-span-4 bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none">
+                    <form id="mentor-form">
+                        
+                        <!-- OPTIMIZER INPUTS -->
+                        <div id="optimizer-inputs" class="space-y-4">
+                            <div class="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl mb-4 border border-emerald-100 dark:border-emerald-800/50">
+                                <h4 class="text-sm font-bold text-emerald-800 dark:text-emerald-400 mb-1"><i class="fas fa-info-circle mr-1"></i> Mode Optimizer</h4>
+                                <p class="text-xs text-emerald-600 dark:text-emerald-500">Masukkan data real dari bisnis Anda saat ini untuk diagnosa bottleneck.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Traffic / Bulan</label>
+                                <input type="number" id="opt-traffic" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500" placeholder="1000">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Conv. Rate (%)</label>
+                                    <input type="number" step="0.01" id="opt-conversion" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500" placeholder="1.5">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Harga Jual</label>
+                                    <input type="number" id="opt-price" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500" placeholder="150000">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">HPP / Unit</label>
+                                    <input type="number" id="opt-cost" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500" placeholder="50000">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Fixed Cost</label>
+                                    <input type="number" id="opt-fixed" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-emerald-500" placeholder="5000000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PLANNER INPUTS -->
+                        <div id="planner-inputs" class="space-y-4 hidden">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl mb-4 border border-blue-100 dark:border-blue-800/50">
+                                <h4 class="text-sm font-bold text-blue-800 dark:text-blue-400 mb-1"><i class="fas fa-info-circle mr-1"></i> Mode Planner</h4>
+                                <p class="text-xs text-blue-600 dark:text-blue-500">Gunakan benchmark industri untuk simulasi bisnis baru Anda.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tipe Bisnis</label>
+                                <select id="planner-type" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-blue-500">
+                                    <option value="digital">Produk Digital (E-course/Software)</option>
+                                    <option value="physical">Produk Fisik (Fashion/F&B)</option>
+                                    <option value="service">Jasa / Agency</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Target Profit / Bulan</label>
+                                <input type="number" id="plan-target" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-blue-500" placeholder="10000000">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Estimasi Harga Jual</label>
+                                <input type="number" id="plan-price" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 focus:ring-blue-500" placeholder="250000">
+                            </div>
+
+                            <div class="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4">
+                                <p class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Internal Benchmark Data</p>
+                                <div class="grid grid-cols-2 gap-4 opacity-75">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 mb-1">Est. Conversion (%)</label>
+                                        <input type="number" id="planner-conversion" disabled class="w-full bg-slate-100 dark:bg-slate-800 border-transparent rounded px-3 py-1.5 text-sm font-mono text-slate-600 cursor-not-allowed">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 mb-1">Est. Margin (%)</label>
+                                        <input type="number" id="planner-margin" disabled class="w-full bg-slate-100 dark:bg-slate-800 border-transparent rounded px-3 py-1.5 text-sm font-mono text-slate-600 cursor-not-allowed">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8">
+                            <button type="submit" id="mentor-submit-btn" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3.5 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                                <i class="fas fa-calculator"></i> Hitung Simulasi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Dashboard Area -->
+                <div id="mentor-board-container" class="lg:col-span-8 relative min-h-[600px]">
+                    
+                    <!-- Loading Overlay -->
+                    <div id="mentor-loading" class="hidden absolute inset-0 bg-white/90 dark:bg-slate-900/90 z-50 flex flex-col items-center justify-center backdrop-blur-sm rounded-3xl transition-all duration-300">
+                        <div class="relative w-20 h-20 mb-6">
+                            <div class="absolute inset-0 border-4 border-slate-200 dark:border-slate-700 rounded-full"></div>
+                            <div class="absolute inset-0 border-4 border-emerald-500 rounded-full border-t-transparent animate-spin"></div>
+                            <i class="fas fa-brain absolute inset-0 flex items-center justify-center text-emerald-500 text-2xl animate-pulse"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 dark:text-white animate-pulse mb-2" id="loading-text">Analyzing Business Structure...</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Please wait while we calculate your potential.</p>
+                    </div>
+
+                    <div id="mentor-dashboard" class="space-y-6 hidden">
+                        
+                        <!-- A. BASELINE SUMMARY -->
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-10">
+                                <i class="fas fa-chart-line text-9xl text-slate-900 dark:text-white"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Financial Baseline</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">Revenue</p>
+                                    <h4 id="res-revenue" class="text-sm sm:text-base md:text-xl font-black text-slate-900 dark:text-white truncate">RP 0</h4>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">Gross Profit</p>
+                                    <h4 id="res-gross" class="text-sm sm:text-base md:text-xl font-bold text-emerald-600 truncate">RP 0</h4>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">Net Profit</p>
+                                    <h4 id="res-net" class="text-sm sm:text-base md:text-xl font-bold text-emerald-500 truncate">RP 0</h4>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">Margin</p>
+                                    <h4 id="res-margin" class="text-sm sm:text-base md:text-xl font-bold text-blue-500 truncate">0%</h4>
+                                </div>
+                            </div>
+                            <!-- Planner Specific: Growth Gap -->
+                            <div id="planner-gap-alert" class="hidden mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+                                <div class="flex items-center gap-2 text-rose-500">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span class="text-xs font-bold">Target Gap: <span id="res-gap-val" class="truncate">RP 0</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PLANNER SPECIFIC: TARGET BREAKDOWN -->
+                        <div id="planner-breakdown" class="hidden bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-100 dark:border-blue-800/30">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="font-bold text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                                        <i class="fas fa-crosshairs"></i> Target Breakdown
+                                    </h3>
+                                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">What you need to hit your goal.</p>
+                                </div>
+                                <span id="plan-feasibility" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase whitespace-nowrap">Analyzing...</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                                <div class="bg-white dark:bg-slate-800 p-2 sm:p-3 rounded-xl shadow-sm">
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold truncate">Sales Needed</p>
+                                    <h4 id="plan-units" class="text-sm sm:text-lg font-black text-slate-800 dark:text-white truncate">0</h4>
+                                    <p class="text-[10px] text-slate-400">units/mo</p>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-2 sm:p-3 rounded-xl shadow-sm">
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold truncate">Traffic Needed</p>
+                                    <h4 id="plan-traffic" class="text-sm sm:text-lg font-black text-slate-800 dark:text-white truncate">0</h4>
+                                    <p class="text-[10px] text-slate-400">visitors/mo</p>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-2 sm:p-3 rounded-xl shadow-sm">
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold truncate">Est. Ad Budget</p>
+                                    <h4 id="plan-budget" class="text-xs sm:text-lg font-black text-slate-800 dark:text-white truncate">RP 0</h4>
+                                    <p class="text-[10px] text-slate-400">@ 10% ROAS</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <!-- B. SCENARIO PLAYGROUND -->
+                            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <h3 class="font-bold text-sm mb-4 flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                                    <i class="fas fa-sliders-h text-slate-400"></i> Scenario Playground
+                                </h3>
+                                <div class="space-y-5">
+                                    <!-- Traffic -->
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <label class="text-xs font-bold text-slate-500">Traffic</label>
+                                            <span id="val-traffic" class="text-xs font-bold text-blue-600">0%</span>
+                                        </div>
+                                        <input type="range" id="slider-traffic" min="-50" max="50" step="5" value="0" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700 accent-blue-600">
+                                    </div>
+                                    <!-- Conversion -->
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <label class="text-xs font-bold text-slate-500">Conversion</label>
+                                            <span id="val-conversion" class="text-xs font-bold text-emerald-600">0%</span>
+                                        </div>
+                                        <input type="range" id="slider-conversion" min="-2" max="3" step="0.1" value="0" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700 accent-emerald-500">
+                                    </div>
+                                    <!-- Price -->
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <label class="text-xs font-bold text-slate-500">Price</label>
+                                            <span id="val-price" class="text-xs font-bold text-purple-600">0%</span>
+                                        </div>
+                                        <input type="range" id="slider-price" min="-30" max="50" step="5" value="0" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700 accent-purple-500">
+                                    </div>
+                                </div>
+                                <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                                    <div>
+                                        <p class="text-xs text-slate-500 uppercase font-bold">Projected Revenue</p>
+                                        <h4 class="text-sm sm:text-lg font-bold text-slate-800 dark:text-white truncate max-w-[150px]">Coming Soon</h4>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-xs text-slate-500 uppercase font-bold">Growth</p>
+                                        <span id="sim-growth" class="text-sm sm:text-lg font-black text-emerald-500">+0%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- C. SENSITIVITY ANALYSIS -->
+                            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <h3 class="font-bold text-sm mb-4 flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                                    <i class="fas fa-chart-bar text-slate-400"></i> Sensitivity Analysis
+                                </h3>
+                                <p class="text-[10px] text-slate-400 mb-4">Impact on Revenue if variable increases by 10%.</p>
+                                
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="font-bold text-slate-600 dark:text-slate-400">Traffic Impact</span>
+                                            <span id="sens-traffic-val" class="font-bold text-blue-500 text-[10px] sm:text-xs">+0%</span>
+                                        </div>
+                                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                            <div id="sens-traffic-bar" class="h-full bg-blue-500" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="font-bold text-slate-600 dark:text-slate-400">Conversion Impact</span>
+                                            <span id="sens-conv-val" class="font-bold text-emerald-500 text-[10px] sm:text-xs">+0%</span>
+                                        </div>
+                                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                            <div id="sens-conv-bar" class="h-full bg-emerald-500" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="font-bold text-slate-600 dark:text-slate-400">Price Impact</span>
+                                            <span id="sens-price-val" class="font-bold text-purple-500 text-[10px] sm:text-xs">+0%</span>
+                                        </div>
+                                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                            <div id="sens-price-bar" class="h-full bg-purple-500" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                            <!-- D. BREAK-EVEN ANALYSIS -->
+                            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <h3 class="font-bold text-sm mb-4 flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                                    <i class="fas fa-balance-scale-right text-slate-400"></i> Break-Even Analysis
+                                </h3>
+                                <div class="grid grid-cols-2 gap-4 text-center mb-4">
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl">
+                                        <p class="text-[10px] text-slate-400 uppercase font-bold">BEP Units</p>
+                                        <h4 id="be-units" class="text-sm sm:text-lg font-bold text-slate-800 dark:text-white truncate">0</h4>
+                                    </div>
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl">
+                                        <p class="text-[10px] text-slate-400 uppercase font-bold">BEP Traffic</p>
+                                        <h4 id="be-traffic" class="text-sm sm:text-lg font-bold text-slate-800 dark:text-white truncate">0</h4>
+                                    </div>
+                                </div>
+                                <div id="be-warning" class="hidden flex items-start gap-2 text-rose-500 bg-rose-50 dark:bg-rose-900/20 p-3 rounded-lg">
+                                    <i class="fas fa-exclamation-circle mt-0.5 flex-shrink-0"></i>
+                                    <span class="text-xs">Warning: Your current traffic is below break-even point. You are operating at a loss.</span>
+                                </div>
+                                <div id="be-success" class="hidden flex items-start gap-2 text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-lg">
+                                    <i class="fas fa-check-circle mt-0.5 flex-shrink-0"></i>
+                                    <span class="text-xs">Great! You are operating above break-even point.</span>
+                                </div>
+                            </div>
+
+                            <!-- E. UPSELL SIMULATOR -->
+                            <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                                    <i class="fas fa-rocket text-8xl text-white"></i>
+                                </div>
+                                <h3 class="font-bold text-sm mb-4 flex items-center gap-2 z-10 relative">
+                                    <i class="fas fa-rocket text-emerald-400"></i> Upsell Simulator
+                                </h3>
+                                
+                                <div class="grid grid-cols-2 gap-3 mb-4 relative z-10">
+                                    <div>
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase">Upsell Price</label>
+                                        <input type="number" id="up-price" class="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-sm text-white focus:border-emerald-500" placeholder="e.g. 50000">
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase">Take Rate %</label>
+                                        <input type="number" id="up-rate" class="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-sm text-white focus:border-emerald-500" placeholder="e.g. 20">
+                                    </div>
+                                </div>
+                                
+                                <button id="btn-simulate-upsell" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 rounded-lg transition-colors relative z-10 mb-4">
+                                    Simulate Upsell
+                                </button>
+
+                                <div id="upsell-result" class="hidden pt-4 border-t border-slate-700 relative z-10">
+                                    <div class="flex justify-between items-end">
+                                        <div>
+                                            <p class="text-[10px] text-slate-400">New Revenue</p>
+                                            <h4 id="up-new-revenue" class="text-sm sm:text-lg font-bold text-white truncate max-w-[120px]">RP 0</h4>
+                                        </div>
+                                        <span id="up-increase" class="text-emerald-400 font-bold text-lg sm:text-xl">+0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- F. DIAGNOSTIC RESULT -->
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border-l-4 border-rose-500 shadow-sm flex flex-col md:flex-row items-start gap-4">
+                            <div class="flex items-center gap-4 w-full">
+                                <div class="w-10 h-10 rounded-full bg-rose-100 flex-shrink-0 flex items-center justify-center text-rose-600">
+                                    <i class="fas fa-user-md text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wide">Diagnostic Result</h4>
+                                    <p id="diag-primary" class="text-base sm:text-lg font-bold text-rose-600 mt-1">Analyzing...</p>
+                                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Recommended Focus: <span id="diag-rec" class="font-bold text-slate-700 dark:text-slate-300">...</span></p>
+                                </div>
+                            </div>
+                            <button id="btn-generate-roadmap" class="w-full md:w-auto mt-4 md:mt-0 px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 whitespace-nowrap">
+                                <i class="fas fa-map-signs"></i> Generate Roadmap
+                            </button>
+                        </div>
+                        
+                        <!-- G. DYNAMIC ROADMAP (Hidden by Default) -->
+                        <div id="roadmap-container" class="hidden mt-8 border-t border-slate-200 dark:border-slate-700 pt-8">
+                            <div class="text-center mb-8">
+                                <h3 class="text-2xl font-black text-slate-900 dark:text-white">Your Personalized Roadmap</h3>
+                                <p class="text-slate-500 dark:text-slate-400">Step-by-step actions to reach your goals.</p>
+                            </div>
+                            
+                            <!-- Roadmap Steps Container -->
+                            <div id="roadmap-steps" class="max-w-3xl mx-auto space-y-0 relative">
+                                <!-- Vertical Connector Line (Absolute) -->
+                                <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700 -ml-px hidden md:block group-hover:bg-emerald-500 transition-colors"></div>
+                                
+                                <!-- Steps will be injected here via JS -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
 
         <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pt-12 pb-32 mt-12">
@@ -741,17 +1121,14 @@
     <script type="module">
         import { logoutUser } from '/assets/js/core/auth-engine.js';
         
-        const logoutBtn = document.getElementById('dropdown-logout-btn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                if (confirm('Are you sure you want to logout?')) {
-                    await logoutUser();
-                }
-            });
-        }
+        // Logout logic moved to main.js with custom confirmation
     </script>
     <script type="module" src="{{ asset('assets/js/core/ad-arsenal-frontend.js') }}"></script>
+
+
+
+    <script type="module" src="{{ asset('assets/js/features/mentor-lab.js') }}"></script>
+    <script type="module" src="{{ asset('assets/js/features/roadmap-engine.js') }}"></script>
     <script>
         // Settings Dropdown Logic
         const settingsBtn = document.getElementById('settings-menu-btn');

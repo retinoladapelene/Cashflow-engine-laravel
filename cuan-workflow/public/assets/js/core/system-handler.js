@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function checkSystemSettings() {
     try {
         // Fetch from API
-        const settings = await api.get('/public/system/settings').catch(() => null) || await api.get('/system/settings');
+        const settings = await api.get('/system/settings');
 
         if (!settings) throw new Error("No settings data");
 

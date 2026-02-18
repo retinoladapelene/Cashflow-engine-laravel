@@ -123,6 +123,24 @@ window.promoteUser = async (userId) => {
     }
 };
 
+window.changeUserPassword = async (userId) => {
+    const newPassword = prompt("Enter new password for this user (min 6 chars):");
+    if (!newPassword) return;
+
+    if (newPassword.length < 6) {
+        alert("Password must be at least 6 characters.");
+        return;
+    }
+
+    try {
+        await api.post(`/admin/users/${userId}/password`, { password: newPassword });
+        showToast("Password updated successfully", "success");
+    } catch (error) {
+        showToast("Failed to update password", "error");
+        console.error(error);
+    }
+};
+
 window.exportUserCSV = () => {
     showToast("Export feature coming soon to API version.", "info");
 };
@@ -518,6 +536,9 @@ const loadUsers = async () => {
                 <td class="p-4 text-right flex justify-end gap-2">
                     <button onclick="window.viewUser(${user.id})" class="p-2 bg-blue-500/10 text-blue-400 rounded hover:bg-blue-500/20 transition-colors" title="Inspect User">
                         <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="window.changeUserPassword(${user.id})" class="p-2 bg-amber-500/10 text-amber-400 rounded hover:bg-amber-500/20 transition-colors" title="Change Password">
+                        <i class="fas fa-key"></i>
                     </button>
                     ${!isBanned ? `
                         <button onclick="window.banUser(${user.id})" class="p-2 bg-rose-500/10 text-rose-400 rounded hover:bg-rose-500/20 transition-colors" title="Ban User">

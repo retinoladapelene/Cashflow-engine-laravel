@@ -318,6 +318,10 @@ function updateProfitChart(labels, data, currency, isLoss) {
         gradient.addColorStop(1, colorBgEnd);
         profitChart.data.datasets[0].backgroundColor = gradient;
 
+        // Update Currency in Options (Ticks & Tooltip)
+        profitChart.options.scales.y.ticks.callback = (value) => formatCurrencyText(value, currency);
+        profitChart.options.plugins.tooltip.callbacks.label = (c) => `Estimasi Profit: ${formatMoney(c.raw, currency)}`;
+
         profitChart.update(isDragging ? 'none' : 'active');
         return;
     }

@@ -17,11 +17,19 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('/arsenal', [AdArsenalController::class, 'index']); // Public access to ads
 Route::get('/system/settings', [App\Http\Controllers\SettingsController::class, 'systemSettings']);
 
+// Mentor Lab API
+// Moved to web.php for Session Auth compatibility
+Route::get('/mentor/preset', [MentorController::class, 'plannerPreset']); // Keep public? No, move to web.
+// Actually, let's remove them from here and put them in web.php
+
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
     // Auth & User
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+
+    // Mentor Roadmap
+    // Moved to web.php for Session Auth compatibility
     
     // Settings API
     Route::get('/settings/activity-logs', [App\Http\Controllers\SettingsController::class, 'activityLogs']);
@@ -54,5 +62,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/arsenal', [AdArsenalController::class, 'store']);
         Route::put('/arsenal/{adArsenal}', [AdArsenalController::class, 'update']);
         Route::delete('/arsenal/{adArsenal}', [AdArsenalController::class, 'destroy']);
+        
+        // User Management
+        Route::post('/users/{user}/password', [AdminController::class, 'updateUserPassword']);
     });
 });

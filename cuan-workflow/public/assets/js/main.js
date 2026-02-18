@@ -4,8 +4,20 @@ import { businessCore } from './core/BusinessCore.js'; // Import Core
 import { calculateGoal, updateCalculator } from './calculator.js';
 import { initTheme } from './theme.js';
 import { startTour } from './tour.js';
-import { select, listen } from './utils/helpers.js';
+import { select, listen, showToast, showConfirm } from './utils/helpers.js';
 import { initScrollEffects, initBackToTop } from './ui.js';
+
+// ... existing code ...
+
+const logoutBtn = select('#btn-logout');
+const dropdownLogoutBtn = select('#dropdown-logout-btn');
+
+const handleLogout = () => {
+    showConfirm("Apakah Anda yakin ingin keluar?", () => logoutUser());
+};
+
+if (logoutBtn) listen(logoutBtn, 'click', handleLogout);
+if (dropdownLogoutBtn) listen(dropdownLogoutBtn, 'click', handleLogout);
 
 
 
@@ -62,8 +74,8 @@ window.onload = async function () { // Make it async
             splash.style.opacity = '0';
             setTimeout(() => {
                 splash.remove();
-            }, 1000);
-        }, 2000);
+            }, 500);
+        }, 500);
     }
 
     try {
@@ -96,8 +108,8 @@ window.onload = async function () { // Make it async
             });
         }
 
-        const logoutBtn = select('#btn-logout');
-        if (logoutBtn) listen(logoutBtn, 'click', () => logoutUser());
+        // Logout listeners are already handled above via const logoutBtn / dropdownLogoutBtn
+
         const btnCalculateGoal = select('button[onclick="calculateGoal()"]');
 
         const btnCalcGoal = select('#btn-calculate-goal');
@@ -113,6 +125,6 @@ window.onload = async function () { // Make it async
         updateCalculator();
     } catch (e) {
         console.error("Main JS Error:", e);
-        alert("Terjadi kesalahan pada aplikasi: " + e.message + ". Silakan refresh halaman.");
+        showToast("Terjadi kesalahan pada aplikasi: " + e.message + ". Silakan refresh halaman.", "error");
     }
 };
